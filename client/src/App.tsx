@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './views/Home';
 import Menu from './views/Menu';
+import Checkout from './views/Checkout';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />}/>
+        <Route path="/checkout" element={<Checkout />} />
       </Routes>
     </Flex>
   );

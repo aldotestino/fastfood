@@ -10,7 +10,7 @@ function Cart() {
 
   return (
     <Tooltip label="Vai al carrello">
-      <HStack _hover={{ color: 'yellow.400' }} as={RLink} to="/cart" >
+      <HStack _hover={{ color: 'yellow.400' }} as={RLink} to="/checkout" >
         <Text>{items.reduce((sum, c) => sum += c.item.price * c.quantity, 0).toFixed(2)} €</Text>
         <Icon as={ShoppingBagIcon}/>
       </HStack>

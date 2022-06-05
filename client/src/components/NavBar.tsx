@@ -22,7 +22,7 @@ function NavBar() {
             <Link to="/menu" fontSize="lg">Menù</Link>
             <Link to="/contatti" fontSize="lg">Contatti</Link>
           </HStack>
-          <HStack>
+          <HStack spacing="5">
             <Cart />
             <Button colorScheme="yellow">Login</Button>
           </HStack>
