@@ -1,6 +1,6 @@
-import { CartItem } from '../types';
-import { IconButton, Td, Tr } from '@chakra-ui/react';
-import { MinusIcon } from '@chakra-ui/icons';
+import { CartItem } from '../utils/types';
+import { IconButton, Td, Tr, Text } from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
 import useCartStore from '../store/cartStore';
 import shallow from 'zustand/shallow';
 
@@ -16,7 +16,7 @@ function CheckoutItem({ cartItem, isDesktop }: CheckoutItemProps) {
   return (
     <Tr>
       <Td>
-        <IconButton aria-label="delete item" mr={2} icon={<MinusIcon />} color="red.400" variant="ghost" onClick={() => deleteItemFromCart(cartItem.id)}/>
+        <IconButton aria-label="delete item" mr={2} icon={<DeleteIcon />} color="red.300" variant="ghost" onClick={() => deleteItemFromCart(cartItem.id)}/>
         {!isDesktop && `${cartItem.quantity} x `}{cartItem.item.name}
       </Td>
       {isDesktop && <>

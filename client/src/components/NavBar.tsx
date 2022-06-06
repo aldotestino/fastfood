@@ -24,7 +24,7 @@ function NavBar() {
           </HStack>
           <HStack spacing="5">
             <Cart />
-            <Button colorScheme="yellow">Login</Button>
+            <Button as={RLink} to="/login" colorScheme="yellow">Login</Button>
           </HStack>
         </>
         :

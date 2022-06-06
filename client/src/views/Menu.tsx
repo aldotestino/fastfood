@@ -4,7 +4,7 @@ import BurgerMetallica from '../assets/food/burger_metallica.png';
 import BurgerTheDoors from '../assets/food/burger_thedoors.png';
 import BurgerSexPistols from '../assets/food/burger_sexpistols.png';
 import WrapCindy from '../assets/food/wrap_cindy.png';
-import { Food } from '../types';
+import { Food } from '../utils/types';
 import { Box, Heading, GridItem, SimpleGrid } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
 
@@ -44,8 +44,8 @@ const burgers: Food[] = [
 function Menu() {
 
   return (
-    <Box p={[5, 10]}>
-      <Heading textAlign="center" size="3xl" mb={[5, 10]}>Menù</Heading>
+    <Box px={[0, 5, 10, 20]} py={[5, 10]}>
+      <Heading ml={[5, 0]} mb="6" fontStyle="italic">Menù</Heading>
       <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
         {burgers.map((b, i) => <GridItem key={i}><MenuItem {...b} /></GridItem>)}
       </SimpleGrid>

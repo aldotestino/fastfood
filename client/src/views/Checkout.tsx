@@ -10,7 +10,7 @@ import {
   Th,
   Thead,
   Tr, useMediaQuery,
-  VStack
+  Heading
 } from '@chakra-ui/react';
 import useCartStore from '../store/cartStore';
 import shallow from 'zustand/shallow';
@@ -24,6 +24,7 @@ function Checkout() {
 
   return (
     <TableContainer px={[0, 5, 10, 20]} py={[5, 10]}>
+      <Heading ml={[5, 0]} mb="6" fontStyle="italic">Checkout</Heading>
       <Table variant="striped">
         {items.length === 0 && <TableCaption>Il carrello è vuoto</TableCaption>}
         <Thead>

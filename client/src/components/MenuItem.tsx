@@ -1,4 +1,4 @@
-import { VStack, Image, Text, HStack, useNumberInput, Button, Input, Icon } from '@chakra-ui/react';
+import { VStack, Image, Text, HStack, Button, Input, Icon } from '@chakra-ui/react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import useCartStore from '../store/cartStore';
@@ -49,18 +49,18 @@ function MenuItem({ image, name, price }: MenuItemProps) {
         name,
         price
       },
-      quantity
+      quantity: isNaN(quantity) ? 1 : quantity
     });
   }
 
   return (
     <VStack>
-      <Image h="xs" cursor="pointer" _hover={{ transform: 'scale(1.2)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={image}/>
+      <Image h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={image}/>
       <VStack>
         <Text fontSize="xl">{name} - {price.toFixed(2)} €</Text>
         <HStack maxW="150px">
           <Button onClick={decrement}>-</Button>
-          <Input value={quantity} type="number" onChange={onInputChange} />
+          <Input value={quantity} type="number" min={1} max={10} onChange={onInputChange} />
           <Button onClick={increment}>+</Button>
         </HStack>
         <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button>
