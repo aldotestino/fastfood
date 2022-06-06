@@ -1,25 +1,43 @@
 import BurgerAcdc from '../assets/food/burger_acdc.png';
 import BurgerLedZeppelin from '../assets/food/burger_ledzeppelin.png';
 import BurgerMetallica from '../assets/food/burger_metallica.png';
+import BurgerTheDoors from '../assets/food/burger_thedoors.png';
+import BurgerSexPistols from '../assets/food/burger_sexpistols.png';
+import WrapCindy from '../assets/food/wrap_cindy.png';
 import { Food } from '../types';
 import { Box, Heading, GridItem, SimpleGrid } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
 
 const burgers: Food[] = [
   {
-    name: 'Ac/Dc',
+    name: 'Burger Ac/Dc',
     price: 10,
     image: BurgerAcdc
   },
   {
-    name: 'Led Zeppelin',
+    name: 'Burger Led Zeppelin',
     price: 12,
     image: BurgerLedZeppelin
   },
   {
-    name: 'Metallica',
+    name: 'Burger Metallica',
     price: 8,
     image: BurgerMetallica
+  },
+  {
+    name: 'Burger The Doors',
+    price: 10,
+    image: BurgerTheDoors
+  },
+  {
+    name: 'Burger Sex Pistols',
+    price: 9,
+    image: BurgerSexPistols
+  },
+  {
+    name: 'Wrap Cindy',
+    price: 5,
+    image: WrapCindy
   }
 ];
 

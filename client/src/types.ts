@@ -5,6 +5,7 @@ export interface Food {
 }
 
 export interface CartItem {
+  id: string
   item: Food
   quantity: number
 }

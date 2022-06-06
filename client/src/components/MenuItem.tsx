@@ -3,6 +3,7 @@ import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import useCartStore from '../store/cartStore';
 import shallow from 'zustand/shallow';
+import shortid from 'shortid';
 
 interface MenuItemProps {
   image: string
@@ -42,6 +43,7 @@ function MenuItem({ image, name, price }: MenuItemProps) {
 
   function handleAddItemToCart() {
     addItemToCart({
+      id: shortid(),
       item: {
         image,
         name,

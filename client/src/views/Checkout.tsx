@@ -9,7 +9,7 @@ import {
   Tfoot,
   Th,
   Thead,
-  Tr,
+  Tr, useMediaQuery,
   VStack
 } from '@chakra-ui/react';
 import useCartStore from '../store/cartStore';
@@ -18,31 +18,34 @@ import CheckoutItem from '../components/CheckoutItem';
 
 function Checkout() {
 
-  const { items } = useCartStore(({ items }) => ({ items }), shallow);
+  const { items, total } = useCartStore(({ items, total }) => ({ items, total }), shallow);
+
+  const [isDesktop] = useMediaQuery('(min-width: 48em)');
 
   return (
-    <TableContainer p={[5, 10]}>
+    <TableContainer px={[0, 5, 10, 20]} py={[5, 10]}>
       <Table variant="striped">
-        {items.length === 0 && <TableCaption>Il carrllo è vuoto</TableCaption>}
+        {items.length === 0 && <TableCaption>Il carrello è vuoto</TableCaption>}
         <Thead>
           <Tr>
             <Th>Nome</Th>
-            <Th isNumeric>Quantità</Th>
-            <Th isNumeric>Prezzo</Th>
+            {isDesktop && <>
+              <Th isNumeric>Quantità</Th>
+              <Th isNumeric>Prezzo</Th>
+            </>}
             <Th isNumeric>Totale</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {items.map((item, i) => <CheckoutItem key={i} cartItem={item} />)}
+          {items.map(item => <CheckoutItem key={item.id} cartItem={item} isDesktop={isDesktop} />)}
         </Tbody>
         {items.length > 0 && <Tfoot>
           <Tr>
-            <Td></Td>
-            <Td></Td>
-            <Td isNumeric fontWeight="bold">
+            {isDesktop && <><Td></Td><Td></Td></>}
+            <Td isNumeric={isDesktop} fontWeight="bold">
               Importo totale
             </Td>
-            <Td isNumeric fontWeight="bold">{items.reduce((s, c) => s + c.item.price * c.quantity, 0).toFixed(2)} €</Td>
+            <Td isNumeric fontWeight="bold">{total().toFixed(2)} €</Td>
           </Tr>
         </Tfoot>}
       </Table>
