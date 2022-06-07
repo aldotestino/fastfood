@@ -1,14 +1,26 @@
 import { FormikHelpers } from 'formik/dist/types';
 
-export interface Food {
+export enum ItemType {
+  APETIZER='APETIZER',
+  BURGER='BURGER',
+  CLUB_SANDWICH='CLUB_SANDWICH',
+  WRAP='WRAP',
+  DESSERT='DESSERT',
+  DRINK='DRINK'
+}
+
+export interface Item {
+  id: string
   name: string
   price: number
-  image: string
+  imageUrl: string
+  ingredients: Array<string>
+  type: ItemType
 }
 
 export interface CartItem {
   id: string
-  item: Food
+  item: Item
   quantity: number
 }
 

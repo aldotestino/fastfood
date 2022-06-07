@@ -11,7 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-assets
 
 # Editor directories and files
 .vscode/*
@@ -23,3 +22,7 @@ assets
 *.njsproj
 *.sln
 *.sw?
+
+*.png
+*.jpeg
+*.avif

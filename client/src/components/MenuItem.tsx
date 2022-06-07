@@ -1,19 +1,15 @@
-import { VStack, Image, Text, HStack, Button, Input, Icon } from '@chakra-ui/react';
-import { ShoppingBagIcon } from '@heroicons/react/outline';
+import { VStack, Image, Text, HStack, Button, Input, Icon, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody, IconButton, UnorderedList, ListItem } from '@chakra-ui/react';
+import { ShoppingBagIcon, InformationCircleIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import useCartStore from '../store/cartStore';
 import shallow from 'zustand/shallow';
 import shortid from 'shortid';
-
-interface MenuItemProps {
-  image: string
-  name: string
-  price: number
-}
+import { Item, ItemType } from '../utils/types';
+import Ingredients from './Ingredients';
 
 const MAX_QUANTITY = 10;
 
-function MenuItem({ image, name, price }: MenuItemProps) {
+function MenuItem(item: Item) {
 
   const [quantity, setQuantity] = useState(1);
   const { addItemToCart } = useCartStore(({ addItemToCart }) => ({ addItemToCart }), shallow);
@@ -44,20 +40,19 @@ function MenuItem({ image, name, price }: MenuItemProps) {
   function handleAddItemToCart() {
     addItemToCart({
       id: shortid(),
-      item: {
-        image,
-        name,
-        price
-      },
+      item, 
       quantity: isNaN(quantity) ? 1 : quantity
     });
   }
 
   return (
     <VStack>
-      <Image h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={image}/>
+      <Image h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={item.imageUrl}/>
       <VStack>
-        <Text fontSize="xl">{name} - {price.toFixed(2)} €</Text>
+        <HStack>
+          {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
+          <Text fontSize="xl">{item.name} - {item.price.toFixed(2)} €</Text>
+        </HStack>
         <HStack maxW="150px">
           <Button onClick={decrement}>-</Button>
           <Input value={quantity} type="number" min={1} max={10} onChange={onInputChange} />

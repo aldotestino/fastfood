@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+  orders    Order[]
+}
+
+model Cook {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String  @unique
+  password String
+  orders   Order[]
+}
+
+model Item {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  type        ItemType
+  price       Float
+  imageUrl    String
+  ingredients String[]
+  orderItem   OrderItem[]
+}
+
+enum ItemType {
+  APETIZER
+  BURGER
+  CLUB_SANDWICH
+  WRAP
+  DESSERT
+  DRINK
+}
+
+model Order {
+  id       String      @id @default(auto()) @map("_id") @db.ObjectId
+  client   Client      @relation(fields: [clientId], references: [id])
+  clientId String
+  dateTime DateTime
+  state    OrderState
+  items    OrderItem[]
+  amuount  Float
+  cook     Cook        @relation(fields: [cookId], references: [id])
+  cookId   String
+
+  @@unique([clientId, dateTime])
+}
+
+enum OrderState {
+  PENDING
+  TAKEN
+  CLOSED
+}
+
+model OrderItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  quantity Int
+  item     Item   @relation(fields: [itemId], references: [id])
+  itemId   String
+  order    Order  @relation(fields: [orderId], references: [id])
+  orderId  String
+}

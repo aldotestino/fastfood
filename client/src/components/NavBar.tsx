@@ -13,11 +13,11 @@ function NavBar() {
   const btnRef = useRef() as RefObject<HTMLButtonElement>;
 
   return (
-    <Flex px={[5, 5, 10, 20]} zIndex={10} h={20} shadow="lg" w="100%" align="center" justify="space-between" bg="whiteAlpha.800" backdropFilter="blur(5px)" pos="sticky" top={0}>
+    <Flex px={[5, 5, 10, 20]} zIndex={1000} h={20} shadow="lg" w="100%" align="center" justify="space-between" bg="whiteAlpha.800" backdropFilter="blur(5px)" pos="sticky" top={0}>
       {isDesktop ?
         <>
           <HStack as="ul" spacing="5">
-            <Heading as={RLink} to="/" size="xl">FastFood</Heading>
+            <Heading as={RLink} fontStyle="italic" to="/" size="xl">FastFood</Heading>
             <Link to="/chi-siamo" fontSize="lg">Chi siamo</Link>
             <Link to="/menu" fontSize="lg">Menù</Link>
             <Link to="/contatti" fontSize="lg">Contatti</Link>
