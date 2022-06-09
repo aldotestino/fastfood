@@ -17,7 +17,7 @@ function CheckoutItem({ cartItem, isDesktop }: CheckoutItemProps) {
     <Tr>
       <Td>
         <IconButton aria-label="delete item" mr={2} icon={<DeleteIcon />} color="red.300" variant="ghost" onClick={() => deleteItemFromCart(cartItem.id)}/>
-        {!isDesktop ? `${cartItem.quantity} x` : cartItem.item.type} {cartItem.item.name}
+        {!isDesktop ? `${cartItem.quantity} x` : cartItem.item.type.replace('_', ' ')} {cartItem.item.name}
       </Td>
       {isDesktop && <>
         <Td isNumeric>{cartItem.quantity}</Td>

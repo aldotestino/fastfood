@@ -1,5 +1,5 @@
-import { VStack, Image, Text, HStack, Button, Input, Icon, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody, IconButton, UnorderedList, ListItem } from '@chakra-ui/react';
-import { ShoppingBagIcon, InformationCircleIcon } from '@heroicons/react/outline';
+import { VStack, Image, Text, HStack, Button, Input, Icon } from '@chakra-ui/react';
+import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import useCartStore from '../store/cartStore';
 import shallow from 'zustand/shallow';

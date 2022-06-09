@@ -6,16 +6,18 @@ import {
   FormLabel,
   Heading,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
 import Link from '../components/Link';
 import { Field, Form, Formik } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import React, { useState } from 'react';
-import { FormikHelpers } from 'formik/dist/types';
 import { LoginVariables, OnSubmitFunc, Role } from '../utils/types';
 import { OptionBase, Select } from 'chakra-react-select';
 import { LoginSchema } from '../utils/validators';
+import { API_URL } from '../utils/vars';
+import { useNavigate } from 'react-router-dom';
 
 const initialValues: LoginVariables = {
   email: 'aldo.testino@libero.it',
@@ -46,14 +48,34 @@ const roleOptions: Array<RoleOptions> = [
 function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const onSubmit: OnSubmitFunc<LoginVariables> = (values, { resetForm }) => {
+  const onSubmit: OnSubmitFunc<LoginVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log(values);
-      setIsLoading(false);
-      resetForm();
-    }, 100);
+    const res = await fetch(`${API_URL}/client/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(values)
+    }).then(r => r.json());
+    resetForm();
+    setIsLoading(false);
+    if(res.success) {
+      console.log(res);
+      navigate('/menu');
+    }else {
+      toast({
+        title: 'Errore',
+        description: res.data.errorMessage,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
   };
 
   return (
@@ -66,7 +88,7 @@ function Login() {
           validationSchema={LoginSchema}
           onSubmit={onSubmit}
         >
-          {({ errors, touched, setFieldValue, values }) =>
+          {({ errors, touched, setFieldValue }) =>
             <Form>
               <Stack spacing="6">
                 <InputField
@@ -74,7 +96,7 @@ function Login() {
                   icon={AtSymbolIcon}
                   errorMessage={errors.email}
                   label="Email"
-                  placeholder="selena@gmail.com"
+                  placeholder="mario@gmail.com"
                   type="text"
                   isInvalid={Boolean(errors.email && touched.email)}
                   isDisabled={isLoading}
@@ -93,7 +115,7 @@ function Login() {
                   {({ field }: {field: any}) =>
                     <FormControl>
                       <FormLabel>Ruolo</FormLabel>
-                      <Select options={roleOptions} defaultValue={roleOptions[0]} onChange={ro => setFieldValue(field.name, ro?.value)} focusBorderColor="yellow.400" />
+                      <Select options={roleOptions} colorScheme="yellow" defaultValue={roleOptions[0]} onChange={ro => setFieldValue(field.name, ro?.value)} focusBorderColor="yellow.400" />
                     </FormControl>}
                 </Field>
                 <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Login</Button>

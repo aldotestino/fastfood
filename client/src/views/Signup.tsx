@@ -1,12 +1,13 @@
-import { Box, Button, Flex, Heading, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, useToast } from '@chakra-ui/react';
 import Link from '../components/Link';
 import { Formik, Form } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
-import { SignupVariables, OnSubmitFunc, LoginVariables } from '../utils/types';
+import { SignupVariables, OnSubmitFunc } from '../utils/types';
 import { SignupSchema } from '../utils/validators';
-import { FormikHelpers } from 'formik/dist/types';
+import { API_URL } from '../utils/vars';
+import { useNavigate } from 'react-router-dom';
 
 const initialValues: SignupVariables = {
   firstName: '',
@@ -18,14 +19,32 @@ const initialValues: SignupVariables = {
 function Signup() {
 
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const onSubmit: OnSubmitFunc<SignupVariables> = (values, { resetForm }) => {
+  const onSubmit: OnSubmitFunc<SignupVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log(values);
-      setIsLoading(false);
-      resetForm();
-    }, 5000);
+    const res = await fetch(`${API_URL}/client/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(values)
+    }).then(r => r.json());
+    resetForm();
+    setIsLoading(false);
+    if(res.success) {
+      navigate('/login');
+    }else {
+      toast({
+        title: 'Errore',
+        description: res.data.errorMessage,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
   };
 
   return (
@@ -45,7 +64,7 @@ function Signup() {
                   name="firstName"
                   errorMessage={errors.firstName}
                   label="First name"
-                  placeholder="Selena"
+                  placeholder="Mario"
                   type="text"
                   isInvalid={Boolean(errors.firstName && touched.firstName)}
                   isDisabled={isLoading}
@@ -54,7 +73,7 @@ function Signup() {
                   name="lastName"
                   errorMessage={errors.lastName}
                   label="Last name"
-                  placeholder="Hamilton"
+                  placeholder="Rossi"
                   type="text"
                   isInvalid={Boolean(errors.lastName && touched.lastName)}
                   isDisabled={isLoading}
@@ -64,7 +83,7 @@ function Signup() {
                   icon={AtSymbolIcon}
                   errorMessage={errors.email}
                   label="Email"
-                  placeholder="selena@gmail.com"
+                  placeholder="mario@gmail.com"
                   type="text"
                   isInvalid={Boolean(errors.email && touched.email)}
                   isDisabled={isLoading}
