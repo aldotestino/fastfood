@@ -12,12 +12,11 @@ import {
   Heading
 } from '@chakra-ui/react';
 import useCartStore from '../store/cartStore';
-import shallow from 'zustand/shallow';
 import CheckoutItem from '../components/CheckoutItem';
 
 function Checkout() {
 
-  const { items, total } = useCartStore(({ items, total }) => ({ items, total }), shallow);
+  const { items, total } = useCartStore();
 
   const [isDesktop] = useMediaQuery('(min-width: 48em)');
 

@@ -1,6 +1,6 @@
 import { Heading, Button, Text, Center, VStack, Image, Flex } from '@chakra-ui/react';
 import { Link as RLink } from 'react-router-dom';
-import HomeImage from '../assets/home_image.jpeg';
+import HomeImage from '../assets/home_image_2.avif';
 
 function Home() {
   return (

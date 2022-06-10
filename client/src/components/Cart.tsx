@@ -2,11 +2,10 @@ import { HStack, Text, Icon, Tooltip } from '@chakra-ui/react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { Link as RLink } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
-import shallow from 'zustand/shallow';
 
 function Cart() {
 
-  const { items, total } = useCartStore(({ items, total }) => ({ items, total }), shallow);
+  const { total } = useCartStore();
 
   return (
     <Tooltip label="Vai al carrello">

@@ -2,7 +2,6 @@ import { VStack, Image, Text, HStack, Button, Input, Icon } from '@chakra-ui/rea
 import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import useCartStore from '../store/cartStore';
-import shallow from 'zustand/shallow';
 import shortid from 'shortid';
 import { Item, ItemType } from '../utils/types';
 import Ingredients from './Ingredients';
@@ -12,7 +11,7 @@ const MAX_QUANTITY = 10;
 function MenuItem(item: Item) {
 
   const [quantity, setQuantity] = useState(1);
-  const { addItemToCart } = useCartStore(({ addItemToCart }) => ({ addItemToCart }), shallow);
+  const { addItemToCart } = useCartStore();
 
   function increment() {
     if(quantity < MAX_QUANTITY) {

@@ -107,18 +107,79 @@ clientController.get('/me', authenticateUser, (req, res, next) => {
   }
 });
 
-clientController.get('/logout', authenticateUser, (req, res, next) => {
-  if(req.cookies[Cookies.ROLE] === UserRole.COOK) {
+clientController.get('/logout', authenticateUser, (req, res, next) => {  
+  if(req.client) {
+    res.clearCookie(Cookies.TOKEN);
+    res.clearCookie(Cookies.ROLE);
+    res.json({
+      success: true
+    });
+  }else {
     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-    return;
   }
-  res.clearCookie(Cookies.TOKEN);
-  res.clearCookie(Cookies.ROLE);
-  res.json({
-    success: true
-  });
 });
 
+clientController.get('/orders', authenticateUser, async(req, res, next) => {
+  if(req.client) {
+    const orders = await prisma.order.findMany({
+      where: {
+        clientId: req.client.id
+      },
+      select: {
+        id: true,
+        state: true,
+        amount: true,
+        dateTime: true
+      }
+    });
+    res.json({
+      success: true,
+      data: {
+        orders
+      }
+    });
+  }else {
+    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
+  }
+});
 
+// clientController.get('/orders', authenticateUser, async (req, res, next) => {
+//   if(req.client) {
+//     const orders = await prisma.order.findMany({
+//       where: {
+//         clientId: req.client.id
+//       },
+//       select: {
+//         state: true,
+//         amuount: true,
+//         cook: {
+//           select: {
+//             id: true
+//           }
+//         },
+//         items: {
+//           select: {
+//             quantity: true,
+//             item: {
+//               select: {
+//                 name: true,
+//                 price: true,
+//                 imageUrl: true
+//               }
+//             }
+//           }
+//         }
+//       }
+//     });
+//     res.json({
+//       success: true,
+//       data: {
+//         orders
+//       }
+//     });
+//   }else {
+//     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
+//   }
+// });
 
 export default clientController;

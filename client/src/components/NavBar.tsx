@@ -1,16 +1,22 @@
-import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, Flex, Heading, HStack, Icon, IconButton, useDisclosure, useMediaQuery, VStack } from '@chakra-ui/react';
-import { useRef, RefObject } from 'react';
-import { Link as RLink } from 'react-router-dom';
-import { MenuAlt2Icon } from '@heroicons/react/outline';
+import { Button, Flex, Heading, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, useMediaQuery } from '@chakra-ui/react';
+import { Link as RLink, useNavigate } from 'react-router-dom';
 import Cart from './Cart';
 import Link from './Link';
+import useUserStore from '../store/userStore';
+import SideBar from './SideBar';
+import Avatar from './Avatar';
 
 function NavBar() {
 
   const [isDesktop] = useMediaQuery('(min-width: 48em)');
+  const navigate = useNavigate();
+  
+  const { user, isAuth, logout } = useUserStore();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const btnRef = useRef() as RefObject<HTMLButtonElement>;
+  async function handleLogout() {
+    await logout();
+    navigate('/');
+  }
 
   return (
     <Flex px={[5, 5, 10, 20]} zIndex={1000} h={20} shadow="lg" w="100%" align="center" justify="space-between" bg="whiteAlpha.800" backdropFilter="blur(5px)" pos="sticky" top={0}>
@@ -24,36 +30,22 @@ function NavBar() {
           </HStack>
           <HStack spacing="5">
             <Cart />
-            <Button as={RLink} to="/login" colorScheme="yellow">Login</Button>
+            {!isAuth ? 
+              <Button as={RLink} to="/login" colorScheme="yellow">Login</Button> :
+              <Menu>
+                <Avatar user={user!} as={MenuButton} />
+                <MenuList>
+                  <MenuItem as={RLink} to="/profile">Profilo</MenuItem>
+                  <MenuDivider />
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
+            }
           </HStack>
         </>
         :
         <>
-          <IconButton ref={btnRef} aria-label='menu' icon={<Icon as={MenuAlt2Icon} />} colorScheme='yellow' onClick={onOpen} />
-          <Drawer
-            isOpen={isOpen}
-            placement='left'
-            onClose={onClose}
-            finalFocusRef={btnRef}
-          >
-            <DrawerOverlay />
-            <DrawerContent>
-              <DrawerCloseButton />
-
-              <DrawerHeader>Naviga</DrawerHeader>
-
-              <DrawerBody>
-                <VStack as="ul" alignItems="start" spacing="5">
-                  <Link to="/chi-siamo" fontSize="lg">Chi siamo</Link>
-                  <Link to="/menu" fontSize="lg">Menù</Link>
-                  <Link to="/contatti" fontSize="lg">Contatti</Link>
-                  <Link to="/login" fontSize="lg">Login</Link>
-                  <Cart />
-                </VStack>
-              </DrawerBody>
-
-            </DrawerContent>
-          </Drawer>
+          <SideBar isAuth={isAuth} user={user} handleLogout={handleLogout} />
           <Heading as={RLink} to="/" size="xl">FastFood</Heading>
           <span></span>
         </>

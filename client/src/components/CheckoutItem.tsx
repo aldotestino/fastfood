@@ -2,7 +2,6 @@ import { CartItem } from '../utils/types';
 import { IconButton, Td, Tr } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import useCartStore from '../store/cartStore';
-import shallow from 'zustand/shallow';
 
 interface CheckoutItemProps {
   cartItem: CartItem,
@@ -11,7 +10,7 @@ interface CheckoutItemProps {
 
 function CheckoutItem({ cartItem, isDesktop }: CheckoutItemProps) {
 
-  const { deleteItemFromCart } = useCartStore(({ deleteItemFromCart }) => ({ deleteItemFromCart }), shallow);
+  const { deleteItemFromCart } = useCartStore();
 
   return (
     <Tr>

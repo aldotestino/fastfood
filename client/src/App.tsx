@@ -6,8 +6,18 @@ import Menu from './views/Menu';
 import Checkout from './views/Checkout';
 import Login from './views/Login';
 import Signup from './views/Signup';
+import useUserStore from './store/userStore';
+import { useEffect } from 'react';
+import Profile from './views/profile';
 
 function App() {
+
+  const { fetch } = useUserStore();
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
   return (
     <Flex minH="100vh" direction="column">
       <NavBar />
@@ -17,6 +27,7 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Flex>
   );

@@ -7,7 +7,8 @@ import { useState } from 'react';
 import { SignupVariables, OnSubmitFunc } from '../utils/types';
 import { SignupSchema } from '../utils/validators';
 import { API_URL } from '../utils/vars';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import useUserStore from '../store/userStore';
 
 const initialValues: SignupVariables = {
   firstName: '',
@@ -21,6 +22,7 @@ function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
+  const { user } = useUserStore();
 
   const onSubmit: OnSubmitFunc<SignupVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
@@ -48,63 +50,66 @@ function Signup() {
   };
 
   return (
-    <Flex py={[0, 10]} align="center" direction="column">
-      <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
-        <Heading mb="6" fontStyle="italic">Signup</Heading>
-        <Formik
-          initialValues={initialValues}
-          validateOnBlur={false}
-          validationSchema={SignupSchema}
-          onSubmit={onSubmit}
-        >
-          {({ errors, touched }) =>
-            <Form>
-              <Stack spacing="6">
-                <InputField
-                  name="firstName"
-                  errorMessage={errors.firstName}
-                  label="First name"
-                  placeholder="Mario"
-                  type="text"
-                  isInvalid={Boolean(errors.firstName && touched.firstName)}
-                  isDisabled={isLoading}
-                />
-                <InputField
-                  name="lastName"
-                  errorMessage={errors.lastName}
-                  label="Last name"
-                  placeholder="Rossi"
-                  type="text"
-                  isInvalid={Boolean(errors.lastName && touched.lastName)}
-                  isDisabled={isLoading}
-                />
-                <InputField
-                  name="email"
-                  icon={AtSymbolIcon}
-                  errorMessage={errors.email}
-                  label="Email"
-                  placeholder="mario@gmail.com"
-                  type="text"
-                  isInvalid={Boolean(errors.email && touched.email)}
-                  isDisabled={isLoading}
-                />
-                <InputField
-                  name="password"
-                  icon={KeyIcon}
-                  errorMessage={errors.password}
-                  label="Password"
-                  placeholder="*****"
-                  type="password"
-                  isInvalid={Boolean(errors.password && touched.password)}
-                  isDisabled={isLoading}
-                />
-                <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Signup</Button>
-                <Link textAlign="center" to="/login">Hai già un&apos;account?</Link>
-              </Stack>
-            </Form>}
-        </Formik>
-      </Box>
-    </Flex>
+    <>
+      {user !== null && <Navigate to="/profile" />}
+      <Flex py={[0, 10]} align="center" direction="column">
+        <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
+          <Heading mb="6" fontStyle="italic">Signup</Heading>
+          <Formik
+            initialValues={initialValues}
+            validateOnBlur={false}
+            validationSchema={SignupSchema}
+            onSubmit={onSubmit}
+          >
+            {({ errors, touched }) =>
+              <Form>
+                <Stack spacing="6">
+                  <InputField
+                    name="firstName"
+                    errorMessage={errors.firstName}
+                    label="First name"
+                    placeholder="Mario"
+                    type="text"
+                    isInvalid={Boolean(errors.firstName && touched.firstName)}
+                    isDisabled={isLoading}
+                  />
+                  <InputField
+                    name="lastName"
+                    errorMessage={errors.lastName}
+                    label="Last name"
+                    placeholder="Rossi"
+                    type="text"
+                    isInvalid={Boolean(errors.lastName && touched.lastName)}
+                    isDisabled={isLoading}
+                  />
+                  <InputField
+                    name="email"
+                    icon={AtSymbolIcon}
+                    errorMessage={errors.email}
+                    label="Email"
+                    placeholder="mario@gmail.com"
+                    type="text"
+                    isInvalid={Boolean(errors.email && touched.email)}
+                    isDisabled={isLoading}
+                  />
+                  <InputField
+                    name="password"
+                    icon={KeyIcon}
+                    errorMessage={errors.password}
+                    label="Password"
+                    placeholder="*****"
+                    type="password"
+                    isInvalid={Boolean(errors.password && touched.password)}
+                    isDisabled={isLoading}
+                  />
+                  <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Signup</Button>
+                  <Link textAlign="center" to="/login">Hai già un&apos;account?</Link>
+                </Stack>
+              </Form>}
+          </Formik>
+        </Box>
+      </Flex>
+    </>
   );
 }
 

@@ -105,15 +105,15 @@ cookController.get('/me', authenticateUser, (req, res, next) => {
 });
 
 cookController.get('/logout', authenticateUser, (req, res, next) => {
-  if(req.cookies[Cookies.ROLE] === UserRole.CLIENT) {
+  if(req.cook) {
+    res.clearCookie(Cookies.TOKEN);
+    res.clearCookie(Cookies.ROLE);
+    res.json({
+      success: true
+    });
+  }else {
     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-    return;
   }
-  res.clearCookie(Cookies.TOKEN);
-  res.clearCookie(Cookies.ROLE);
-  res.json({
-    success: true
-  });
 });
 
 export default cookController;

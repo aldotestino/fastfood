@@ -1,4 +1,5 @@
 import create from 'zustand';
+import shallow from 'zustand/shallow';
 import { CartItem } from '../utils/types';
 
 interface CartStore {
@@ -8,11 +9,15 @@ interface CartStore {
   total: () => number
 }
 
-const useCartStore = create<CartStore>((setState, getState) => ({
+const useStore = create<CartStore>((setState, getState) => ({
   items: [],
-  addItemToCart: (newItem: CartItem) => setState(state => ({ items: [...state.items, newItem] })),
-  deleteItemFromCart: (id: string) => setState(state => ({ items: state.items.filter(i => i.id !== id) })),
+  addItemToCart: (newItem) => setState(state => ({ items: [...state.items, newItem] })),
+  deleteItemFromCart: (id) => setState(state => ({ items: state.items.filter(i => i.id !== id) })),
   total: () => getState().items.reduce((sum, i) => sum += i.item.price*i.quantity, 0)
 }));
+
+function useCartStore() {
+  return useStore(({ items, addItemToCart, deleteItemFromCart, total }) => ({ items, addItemToCart, deleteItemFromCart, total }), shallow);
+}
 
 export default useCartStore;

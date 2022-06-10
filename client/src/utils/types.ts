@@ -24,7 +24,7 @@ export interface CartItem {
   quantity: number
 }
 
-export enum Role {
+export enum UserRole {
   CLIENT='CLIENT',
   COOK='COOK',
   ADMIN='ADMIN'
@@ -33,7 +33,7 @@ export enum Role {
 export interface LoginVariables {
   email: string
   password: string,
-  role: Role
+  role: UserRole
 }
 
 export interface SignupVariables {
@@ -43,5 +43,35 @@ export interface SignupVariables {
   password: string
 }
 
+interface UserGeneral {
+  id: string
+  email: string
+}
+
+export interface Client extends UserGeneral {
+  firstName: string
+  lastName: string
+}
+
+export type Cook = UserGeneral
+
+export interface User {
+  role: UserRole
+  client: Client | null
+  cook: Cook | null
+}
+
+export enum OrderState {
+  PENDING='PENDING',
+  TAKEN='TAKEN',
+  CLOSED='CLOSED'
+}
+
+export interface Order {
+  id: string
+  amount: number,
+  state: OrderState,
+  dateTime: string
+}
 
 export type OnSubmitFunc<T> = (values: T, formikHelpers: FormikHelpers<T>) => void;
