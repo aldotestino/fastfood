@@ -46,7 +46,7 @@ function NavBar() {
         :
         <>
           <SideBar isAuth={isAuth} user={user} handleLogout={handleLogout} />
-          <Heading as={RLink} to="/" size="xl">FastFood</Heading>
+          <Heading as={RLink} to="/" fontStyle="italic" size="xl">FastFood</Heading>
           <span></span>
         </>
       }

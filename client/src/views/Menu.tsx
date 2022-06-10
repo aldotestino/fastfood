@@ -40,7 +40,7 @@ function Menu() {
         {
           Object.entries(items).map(([key, list]: [string,  Array<Item>]) => 
             <Box key={key}>
-              <Heading textAlign="center" mt="6" color="yellow.400" size="lg">{key}</Heading>
+              <Heading textAlign="center" mt="6" mb="6" color="yellow.400" size="lg">{key}</Heading>
               <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
                 {list.map((item, i) => <GridItem key={i}><MenuItem {...item} /></GridItem>)}
               </SimpleGrid>

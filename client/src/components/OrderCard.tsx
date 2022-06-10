@@ -9,9 +9,12 @@ const badgeColor = {
 };
 
 function OrderCard(order: Order) {
+
+  const orderState = order.state === OrderState.CLOSED ? 'Chiuso' : order.state === OrderState.PENDING ? 'In attesa' : 'In preparazione'; 
+
   return (
     <Stat>
-      <StatLabel as={Badge} colorScheme={badgeColor[order.state]}>{order.state}</StatLabel>
+      <StatLabel as={Badge} colorScheme={badgeColor[order.state]}>{orderState}</StatLabel>
       <StatNumber py={2}>{order.amount.toFixed(2)} €</StatNumber>
       <StatHelpText>{formatDate(order.dateTime)}</StatHelpText>
     </Stat>

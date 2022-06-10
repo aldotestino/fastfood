@@ -5,10 +5,13 @@ import useCartStore from '../store/cartStore';
 import shortid from 'shortid';
 import { Item, ItemType } from '../utils/types';
 import Ingredients from './Ingredients';
+import { IMAGE_URL } from '../utils/vars';
 
 const MAX_QUANTITY = 10;
 
 function MenuItem(item: Item) {
+
+  const imageUrl = `${IMAGE_URL}/${item.imageUrl}`;
 
   const [quantity, setQuantity] = useState(1);
   const { addItemToCart } = useCartStore();
@@ -46,7 +49,7 @@ function MenuItem(item: Item) {
 
   return (
     <VStack>
-      <Image h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={item.imageUrl}/>
+      <Image alt={item.name} h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={imageUrl}/>
       <VStack>
         <HStack>
           {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
@@ -54,7 +57,8 @@ function MenuItem(item: Item) {
         </HStack>
         <HStack maxW="150px">
           <Button onClick={decrement}>-</Button>
-          <Input value={quantity} type="number" min={1} max={10} onChange={onInputChange} />
+          <label htmlFor="quantity" hidden></label>
+          <Input value={quantity} name="quantity" type="number" min={1} max={10} onChange={onInputChange} />
           <Button onClick={increment}>+</Button>
         </HStack>
         <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button>

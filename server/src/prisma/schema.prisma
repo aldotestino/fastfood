@@ -49,7 +49,7 @@ model Order {
   id       String      @id @default(auto()) @map("_id") @db.ObjectId
   client   Client?     @relation(fields: [clientId], references: [id])
   clientId String?
-  dateTime DateTime
+  dateTime DateTime    @default(now())
   state    OrderState
   items    OrderItem[]
   amount   Float

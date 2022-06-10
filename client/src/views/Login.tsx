@@ -12,7 +12,7 @@ import Link from '../components/Link';
 import { Field, Form, Formik } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { LoginVariables, OnSubmitFunc, UserRole } from '../utils/types';
 import { OptionBase, Select } from 'chakra-react-select';
 import { LoginSchema } from '../utils/validators';
@@ -20,8 +20,8 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 
 const initialValues: LoginVariables = {
-  email: 'aldo.testino@libero.it',
-  password: 'atxfour300101',
+  email: '',
+  password: '',
   role: UserRole.CLIENT
 };
 
@@ -58,12 +58,11 @@ function Login() {
     setIsLoading(false);
     resetForm();
     if(res.success) {
-      console.log(res);
       navigate('/profile');
     }else {
       toast({
         title: 'Errore',
-        description: res.data.erroMessage,
+        description: res.data.errorMessage,
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -73,63 +72,61 @@ function Login() {
   };
 
   return (
-    <>
+    <Flex py={[0, 10]} align="center" direction="column">
       {isAuth && <Navigate to="/profile" />}
-      <Flex py={[0, 10]} align="center" direction="column">
-        <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
-          <Heading mb="6" fontStyle="italic">Login</Heading>
-          <Formik
-            initialValues={initialValues}
-            validateOnBlur={false}
-            validationSchema={LoginSchema}
-            onSubmit={onSubmit}
-          >
-            {({ errors, touched, setFieldValue }) =>
-              <Form>
-                <Stack spacing="6">
-                  <InputField
-                    name="email"
-                    icon={AtSymbolIcon}
-                    errorMessage={errors.email}
-                    label="Email"
-                    placeholder="mario@gmail.com"
-                    type="text"
-                    isInvalid={Boolean(errors.email && touched.email)}
-                    isDisabled={isLoading}
-                  />
-                  <InputField
-                    name="password"
-                    icon={KeyIcon}
-                    errorMessage={errors.password}
-                    label="Password"
-                    placeholder="*****"
-                    type="password"
-                    isInvalid={Boolean(errors.password && touched.password)}
-                    isDisabled={isLoading}
-                  />
-                  <Field name="role">
-                    {({ field }: {field: any}) =>
-                      <FormControl>
-                        <FormLabel>Ruolo</FormLabel>
-                        <Select 
-                          options={roleOptions} 
-                          colorScheme="yellow" 
-                          defaultValue={roleOptions[0]} 
-                          onChange={ro => setFieldValue(field.name, ro?.value)} 
-                          focusBorderColor="yellow.400"
-                          selectedOptionStyle='check'
-                          selectedOptionColor='yellow'
-                        />
-                      </FormControl>}
-                  </Field>
-                  <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Login</Button>
-                  <Link textAlign="center" to="/signup">Non hai un&apos;account?</Link>
-                </Stack>
-              </Form>}
-          </Formik>
-        </Box>
-      </Flex>
-    </>
+      <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
+        <Heading mb="6" fontStyle="italic">Login</Heading>
+        <Formik
+          initialValues={initialValues}
+          validateOnBlur={false}
+          validationSchema={LoginSchema}
+          onSubmit={onSubmit}
+        >
+          {({ errors, touched, setFieldValue }) =>
+            <Form>
+              <Stack spacing="6">
+                <InputField
+                  name="email"
+                  icon={AtSymbolIcon}
+                  errorMessage={errors.email}
+                  label="Email"
+                  placeholder="mario@gmail.com"
+                  type="text"
+                  isInvalid={Boolean(errors.email && touched.email)}
+                  isDisabled={isLoading}
+                />
+                <InputField
+                  name="password"
+                  icon={KeyIcon}
+                  errorMessage={errors.password}
+                  label="Password"
+                  placeholder="*****"
+                  type="password"
+                  isInvalid={Boolean(errors.password && touched.password)}
+                  isDisabled={isLoading}
+                />
+                <Field name="role">
+                  {({ field }: {field: any}) =>
+                    <FormControl>
+                      <FormLabel>Ruolo</FormLabel>
+                      <Select 
+                        options={roleOptions} 
+                        colorScheme="yellow" 
+                        defaultValue={roleOptions[0]} 
+                        onChange={ro => setFieldValue(field.name, ro?.value)} 
+                        focusBorderColor="yellow.400"
+                        selectedOptionStyle='check'
+                        selectedOptionColor='yellow'
+                      />
+                    </FormControl>}
+                </Field>
+                <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Login</Button>
+                <Link textAlign="center" to="/signup">Non hai un&apos;account?</Link>
+              </Stack>
+            </Form>}
+        </Formik>
+      </Box>
+    </Flex>
   );
 }
 

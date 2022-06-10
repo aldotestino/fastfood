@@ -10,7 +10,7 @@ function Home() {
         <VStack spacing="6" >
           <Heading size={['2xl', '2xl', '2xl', '4xl']} textAlign="center">Mangia a modo tuo!</Heading>
           <Text fontSize={['2xl', '2xl', '2xl', '3xl']} fontWeight="light" align="center">Scegli tra i tanti prodotti <br /> disponibili nel nostro menù</Text>
-          <Button colorScheme="yellow" as={RLink} to="/menu">Vai al menù</Button>
+          <Button size="lg" colorScheme="yellow" as={RLink} to="/menu">Vai al menù</Button>
         </VStack>
       </Center>
     </Flex>

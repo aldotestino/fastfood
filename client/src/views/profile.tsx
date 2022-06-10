@@ -1,6 +1,6 @@
 import { Box, Heading, HStack, VStack, Text, Tabs, TabList, TabPanels, TabPanel, Tab, Divider } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import OrderCard from '../components/OrderCard';
 import useUserStore from '../store/userStore';
@@ -11,13 +11,6 @@ function Profile() {
 
   const { isAuth, user } = useUserStore();
   const [orders, setOrders] = useState<Array<Order>>([]);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if(!isAuth) {
-      navigate('/login');
-    }
-  }, [isAuth]);
 
   useEffect(() => {
     fetch(`${API_URL}/client/orders`, {
@@ -31,6 +24,7 @@ function Profile() {
 
   return (
     <Box px={[5, 5, 10, 20]} py={[5, 10]}>
+      {!isAuth && <Navigate to="/login" />}
       <HStack spacing="4" mb="6">
         <Avatar size={['xl', '2xl']} user={user} />
         <VStack align="flex-start">

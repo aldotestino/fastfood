@@ -7,7 +7,7 @@ interface LoginApiResponse {
   success: boolean
   data: {
     user?: Client | Cook
-    erroMessage?: string
+    errorMessage?: string
   }
 }
 
@@ -21,7 +21,7 @@ interface LogoutApiResponse {
 interface UserStore {
   user: User | null,
   isAuth: boolean,
-  fetch: () => void
+  fetch: () => Promise<null>
   login: (values: LoginVariables) => Promise<LoginApiResponse>
   logout: () => Promise<LogoutApiResponse>
 }
@@ -34,7 +34,7 @@ const useStore = create<UserStore>((setState, getState) => ({
     if(!userRole) {
       return null;
     }
-    const res = await fetch(`${API_URL}/${userRole}/me`, {
+    const res = await fetch(`${API_URL}/${userRole.toLowerCase()}/me`, {
       credentials: 'include'
     }).then(r => r.json());
     if(res.success) {
@@ -47,6 +47,7 @@ const useStore = create<UserStore>((setState, getState) => ({
         }
       });
     }
+    return null;
   },
   login: async ({ role, ...values }) => {
     const userRole = role.toLowerCase();
