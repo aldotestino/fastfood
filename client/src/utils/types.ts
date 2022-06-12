@@ -25,7 +25,7 @@ export interface CartItem {
 }
 
 export enum UserRole {
-  CLIENT='CLIENT',
+  CUSTOMER='CUSTOMER',
   COOK='COOK',
   ADMIN='ADMIN'
 }
@@ -48,7 +48,7 @@ interface UserGeneral {
   email: string
 }
 
-export interface Client extends UserGeneral {
+export interface Customer extends UserGeneral {
   firstName: string
   lastName: string
 }
@@ -57,7 +57,7 @@ export type Cook = UserGeneral
 
 export interface User {
   role: UserRole
-  client: Client | null
+  customer: Customer | null
   cook: Cook | null
 }
 

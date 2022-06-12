@@ -3,8 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import menuController from './controllers/menuController';
-import clientController from './controllers/clientController';
-import { Client, Cook } from '@prisma/client';
+import customerController from './controllers/customerController';
+import { Customer, Cook } from '@prisma/client';
 import cookController from './controllers/cookController';
 import { handleError } from './utils/middlewares';
 
@@ -14,7 +14,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      client: Partial<Client>,
+      customer: Partial<Customer>,
       cook: Partial<Cook>
     }
   }
@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/v1/menu', menuController);
-app.use('/api/v1/client', clientController);
+app.use('/api/v1/customer', customerController);
 app.use('/api/v1/cook', cookController);
 
 app.use(handleError);

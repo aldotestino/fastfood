@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import CustomError from '../utils/CustomError';
-import { Cookies, ErrorCode, UserRole } from '../utils/types';
+import { Cookie, ErrorCode, UserRole } from '../utils/types';
 import { authenticateUser } from '../utils/middlewares';
 import { CookSignupSchema, LoginSchema } from '../utils/validators';
 
@@ -45,7 +45,7 @@ cookController.post('/signup', async (req, res, next) => {
 
 cookController.post('/login', async (req, res, next) => {
 
-  if(req.cookies[Cookies.TOKEN]) {
+  if(req.cookies[Cookie.TOKEN]) {
     next(new CustomError('Utente già loggato', ErrorCode.UNAUTHORIZED));
     return;
   }
@@ -75,10 +75,9 @@ cookController.post('/login', async (req, res, next) => {
     return;
   }
 
-  const token = jwt.sign(user.id, process.env.JWT_SECRET!);
+  const token = jwt.sign({ id: user.id, role: UserRole.COOK }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookies.TOKEN, token);
-  res.cookie(Cookies.ROLE, UserRole.COOK);
+  res.cookie(Cookie.TOKEN, token);
 
   res.json({
     success: true,
@@ -106,8 +105,7 @@ cookController.get('/me', authenticateUser, (req, res, next) => {
 
 cookController.get('/logout', authenticateUser, (req, res, next) => {
   if(req.cook) {
-    res.clearCookie(Cookies.TOKEN);
-    res.clearCookie(Cookies.ROLE);
+    res.clearCookie(Cookie.TOKEN);
     res.json({
       success: true
     });

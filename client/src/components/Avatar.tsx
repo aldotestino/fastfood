@@ -11,7 +11,7 @@ function Avatar({ user, ...rest }: AvatarProps) {
   return (
     <CAvatar {...rest}
       src={
-        user && user.role === UserRole.CLIENT && user.client ? getImageUrl(user.client?.firstName, user.client?.lastName) : ''
+        user && user.role === UserRole.CUSTOMER && user.customer ? getImageUrl(user.customer?.firstName, user.customer?.lastName) : ''
       }
       name={user && user.role === UserRole.COOK && user.cook ? user.cook && user.cook?.email : ''} />
   );

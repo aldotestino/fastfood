@@ -27,3 +27,4 @@ mongo-data
 *.png
 *.jpeg
 *.avif
+seed.ts

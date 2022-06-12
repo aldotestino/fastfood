@@ -10,10 +10,9 @@ export enum ErrorCode {
 export enum UserRole {
   ADMIN='ADMIN',
   COOK='COOK',
-  CLIENT='CLIENT'
+  CUSTOMER='CUSTOMER'
 }
 
-export enum Cookies {
+export enum Cookie {
   TOKEN='access-token',
-  ROLE='user-role'
 }

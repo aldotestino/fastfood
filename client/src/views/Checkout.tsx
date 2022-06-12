@@ -9,19 +9,61 @@ import {
   Th,
   Thead,
   Tr, useMediaQuery,
-  Heading
+  Heading,
+  Text,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react';
+import Link from '../components/Link';
 import useCartStore from '../store/cartStore';
 import CheckoutItem from '../components/CheckoutItem';
+import { RefObject, useRef, useState } from 'react';
+import { Link as RLink } from 'react-router-dom';
+import useUserStore from '../store/userStore';
+import { API_URL } from '../utils/vars';
 
 function Checkout() {
 
-  const { items, total } = useCartStore();
+  const { items, clearCart, total } = useCartStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isDesktop] = useMediaQuery('(min-width: 48em)');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef() as RefObject<HTMLButtonElement>;
+  const { isAuth } = useUserStore();
+  const toast = useToast();
 
-  function handleCheckout() {
-    console.log(items);
+  async function handleCheckout() {
+    setIsLoading(true);
+
+    const res = await fetch(`${API_URL}/customer/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(items.map(i => ({ itemId: i.item.id, quantity: i.quantity }))),
+      credentials: 'include'
+    }).then(r => r.json());
+
+    setIsLoading(false);
+    onClose();
+    if(res.success) {
+      clearCart();
+      toast({
+        title: 'Ordine creato',
+        description: <Text>Visualizza lo stato dell&apos;ordine nel <Link noColor to='/profile'>tuo profilo</Link></Text>,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
   }
 
   return (
@@ -54,10 +96,43 @@ function Checkout() {
             <Tr>
               {isDesktop && <><Td borderBottom="none"></Td><Td borderBottom="none"></Td></>}
               <Td borderBottom="none"></Td>
-              <Td isNumeric borderBottom="none"><Button onClick={handleCheckout} colorScheme="yellow">Checkout</Button></Td>
+              <Td isNumeric borderBottom="none"><Button onClick={onOpen} colorScheme="yellow">Checkout</Button></Td>
             </Tr>
           </Tfoot>}
         </Table>
+        
+        <AlertDialog
+          isOpen={isOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+          closeOnOverlayClick={!isLoading}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                Checkout
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                {isAuth ? 'Sei sicuro di voler procedere con l\'acquisto dei prodotti?' : 'Prima di procedere con l\'acquisto è necessario effettuare il login.'}
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button disabled={isLoading} ref={cancelRef} onClick={onClose}>
+                  Annulla
+                </Button>
+                {isAuth ? 
+                  <Button colorScheme='yellow' isLoading={isLoading} onClick={handleCheckout} ml={3}>
+                    Continua
+                  </Button> : 
+                  <Button colorScheme='yellow' as={RLink} to="/login"  ml={3}>
+                    Login
+                  </Button>}
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+
       </TableContainer>
     </>
   );

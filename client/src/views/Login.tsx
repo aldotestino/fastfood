@@ -22,7 +22,7 @@ import useUserStore from '../store/userStore';
 const initialValues: LoginVariables = {
   email: '',
   password: '',
-  role: UserRole.CLIENT
+  role: UserRole.CUSTOMER
 };
 
 interface RoleOptions extends OptionBase {
@@ -33,7 +33,7 @@ interface RoleOptions extends OptionBase {
 const roleOptions: Array<RoleOptions> = [
   {
     label: 'Cliente',
-    value: UserRole.CLIENT,
+    value: UserRole.CUSTOMER,
   },
   {
     label: 'Cuoco',

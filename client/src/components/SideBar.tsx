@@ -36,7 +36,7 @@ function SideBar({ isAuth, user, handleLogout }: SideBarProps) {
             <DrawerHeader>
               <HStack>
                 <Avatar user={user} />
-                <Text>Ciao, {user!.client?.firstName}</Text>
+                <Text>Ciao, {user!.customer?.firstName}</Text>
               </HStack>
             </DrawerHeader>}
 

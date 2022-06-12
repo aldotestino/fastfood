@@ -26,7 +26,7 @@ function Signup() {
 
   const onSubmit: OnSubmitFunc<SignupVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
-    const res = await fetch(`${API_URL}/client/signup`, {
+    const res = await fetch(`${API_URL}/customer/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

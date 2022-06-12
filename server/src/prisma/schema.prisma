@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Client {
+model Customer {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   firstName String
   lastName  String
@@ -28,7 +28,7 @@ model Cook {
 
 model Item {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
+  name        String      @unique
   type        ItemType
   price       Float
   imageUrl    String
@@ -46,15 +46,15 @@ enum ItemType {
 }
 
 model Order {
-  id       String      @id @default(auto()) @map("_id") @db.ObjectId
-  client   Client?     @relation(fields: [clientId], references: [id])
-  clientId String?
-  dateTime DateTime    @default(now())
-  state    OrderState
-  items    OrderItem[]
-  amount   Float
-  cook     Cook?       @relation(fields: [cookId], references: [id])
-  cookId   String?
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  customerId String?
+  dateTime   DateTime    @default(now())
+  state      OrderState
+  items      OrderItem[]
+  amount     Float
+  cook       Cook?       @relation(fields: [cookId], references: [id])
+  cookId     String?
 }
 
 enum OrderState {

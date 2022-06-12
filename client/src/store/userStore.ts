@@ -1,12 +1,12 @@
 import create from 'zustand';
 import shallow from 'zustand/shallow';
-import { Client, Cook, LoginVariables, User, UserRole } from '../utils/types';
+import { Customer, Cook, LoginVariables, User, UserRole } from '../utils/types';
 import { API_URL } from '../utils/vars';
 
 interface LoginApiResponse {
   success: boolean
   data: {
-    user?: Client | Cook
+    user?: Customer | Cook
     errorMessage?: string
   }
 }
@@ -42,7 +42,7 @@ const useStore = create<UserStore>((setState, getState) => ({
         isAuth: true,
         user: {
           role: userRole,
-          client: userRole === UserRole.CLIENT ? res.data.user : null,
+          customer: userRole === UserRole.CUSTOMER ? res.data.user : null,
           cook: userRole === UserRole.COOK ? res.data.user : null
         }
       });
@@ -65,7 +65,7 @@ const useStore = create<UserStore>((setState, getState) => ({
         isAuth: true,
         user: {
           role,
-          client: role === UserRole.CLIENT ? res.data.user : null,
+          customer: role === UserRole.CUSTOMER ? res.data.user : null,
           cook: role === UserRole.COOK ? res.data.user: null
         }
       });

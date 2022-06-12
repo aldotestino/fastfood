@@ -13,7 +13,7 @@ function Profile() {
   const [orders, setOrders] = useState<Array<Order>>([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/client/orders`, {
+    fetch(`${API_URL}/customer/orders`, {
       credentials: 'include'
     }).then(r => r.json()).then(res => {
       if(res.success) {
@@ -28,8 +28,8 @@ function Profile() {
       <HStack spacing="4" mb="6">
         <Avatar size={['xl', '2xl']} user={user} />
         <VStack align="flex-start">
-          <Heading size={['lg', 'xl']}>Ciao, {user?.client?.firstName || user?.cook?.email}</Heading>
-          {user?.role === UserRole.CLIENT && <Text fontSize="xl">{user.client?.email}</Text>}
+          <Heading size={['lg', 'xl']}>Ciao, {user?.customer?.firstName || user?.cook?.email}</Heading>
+          {user?.role === UserRole.CUSTOMER && <Text fontSize="xl">{user.customer?.email}</Text>}
         </VStack>
       </HStack>
       <Tabs isLazy variant='enclosed' colorScheme="yellow">
