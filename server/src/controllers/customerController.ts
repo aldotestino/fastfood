@@ -79,7 +79,9 @@ customerController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.CUSTOMER }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token);
+  const aDayInMillis = 24*60*60*1000;
+
+  res.cookie(Cookie.TOKEN, token, { maxAge: aDayInMillis });
 
   res.json({
     success: true,
@@ -123,6 +125,9 @@ customerController.get('/orders', authenticateUser, async (req, res, next) => {
     const orders = await prisma.order.findMany({
       where: {
         customerId: req.customer.id
+      },
+      orderBy: {
+        dateTime: 'desc'
       },
       select: {
         id: true,

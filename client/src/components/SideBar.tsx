@@ -43,15 +43,15 @@ function SideBar({ isAuth, user, handleLogout }: SideBarProps) {
           <DrawerBody>
             <VStack as="ul" alignItems="start" spacing="5">
               {user !== null && <>
-                <Link to="/profile">Profilo</Link>
-                <ButtonLink action={handleLogout}>Logout</ButtonLink>
+                <Link to="/profile" onClick={onClose}>Profilo</Link>
+                <ButtonLink action={handleLogout} onClick={onClose}>Logout</ButtonLink>
                 <Divider />
               </>}
-              <Link to="/chi-siamo" fontSize="lg">Chi siamo</Link>
-              <Link to="/menu" fontSize="lg">Menù</Link>
-              <Link to="/contatti" fontSize="lg">Contatti</Link>
-              {!isAuth && <Link to="/login" fontSize="lg">Login</Link>}
-              <Cart />
+              <Link to="/chi-siamo" fontSize="lg" onClick={onClose}>Chi siamo</Link>
+              <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
+              <Link to="/contatti" fontSize="lg" onClick={onClose}>Contatti</Link>
+              {!isAuth && <Link to="/login" fontSize="lg" onClick={onClose}>Login</Link>}
+              <Cart onClick={onClose} />
             </VStack>
           </DrawerBody>
 

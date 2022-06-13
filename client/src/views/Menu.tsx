@@ -1,5 +1,5 @@
 import { Item, ItemType } from '../utils/types';
-import { Box, Heading, GridItem, SimpleGrid } from '@chakra-ui/react';
+import { Box, Heading, GridItem, SimpleGrid, VStack, Divider } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
 import { useEffect, useState } from 'react';
 import { API_URL } from '../utils/vars';
@@ -36,18 +36,18 @@ function Menu() {
   return (
     <Box px={[0, 5, 10, 20]} py={[5, 10]}>
       <Heading ml={[5, 0]} fontStyle="italic">Menù</Heading>
-      <Box>
+      <VStack w="100%" spacing="20">
         {
           Object.entries(items).map(([key, list]: [string,  Array<Item>]) => 
-            <Box key={key}>
-              <Heading textAlign="center" mt="6" mb="6" color="yellow.400" size="lg">{key}</Heading>
+            <Box w="100%" key={key}>
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">{key}</Heading>
               <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
                 {list.map((item, i) => <GridItem key={i}><MenuItem {...item} /></GridItem>)}
               </SimpleGrid>
             </Box>
           )
         }
-      </Box>
+      </VStack>
     </Box>
   );
 }
