@@ -48,7 +48,7 @@ const roleOptions: Array<RoleOptions> = [
 function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
-  const { login, isAuth } = useUserStore();
+  const { login, isAuth, user } = useUserStore();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -57,9 +57,7 @@ function Login() {
     const res = await login(values);
     setIsLoading(false);
     resetForm();
-    if(res.success) {
-      navigate('/profile');
-    }else {
+    if(!res.success) {
       toast({
         title: 'Errore',
         description: res.data.errorMessage,
@@ -73,7 +71,7 @@ function Login() {
 
   return (
     <Flex py={[0, 10]} align="center" direction="column">
-      {isAuth && <Navigate to="/profile" />}
+      {isAuth && user?.role === UserRole.CUSTOMER ? <Navigate to="/profile" /> : isAuth && user?.role == UserRole.COOK ? <Navigate to="/" /> : null}
       <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
         <Heading mb="6" fontStyle="italic">Login</Heading>
         <Formik

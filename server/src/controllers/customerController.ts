@@ -7,6 +7,7 @@ import { Cookie, ErrorCode, UserRole } from '../utils/types';
 import { authenticateUser } from '../utils/middlewares';
 import { LoginSchema, CustomerSignupSchema } from '../utils/validators';
 import { OrderState } from '@prisma/client';
+import { aDayInMillis } from '../utils/vars';
 
 const customerController = Router();
 
@@ -67,7 +68,7 @@ customerController.post('/login', async (req, res, next) => {
   });
 
   if(!user) {
-    next(new CustomError('Email inesistente', ErrorCode.INVALID_EMAIL));
+    next(new CustomError('Email inesistente', ErrorCode.EMAIL_NOT_FOUND));
     return;
   }
 
@@ -78,8 +79,6 @@ customerController.post('/login', async (req, res, next) => {
   }
 
   const token = jwt.sign({ id: user.id, role: UserRole.CUSTOMER }, process.env.JWT_SECRET!);
-
-  const aDayInMillis = 24*60*60*1000;
 
   res.cookie(Cookie.TOKEN, token, { maxAge: aDayInMillis });
 

@@ -7,6 +7,7 @@ import customerController from './controllers/customerController';
 import { Customer, Cook } from '@prisma/client';
 import cookController from './controllers/cookController';
 import { handleError } from './utils/middlewares';
+import orderController from './controllers/orderController';
 
 const PORT = process.env.PORT || 3001;
 
@@ -42,6 +43,7 @@ app.use(function(req, res, next) {
 app.use('/api/v1/menu', menuController);
 app.use('/api/v1/customer', customerController);
 app.use('/api/v1/cook', cookController);
+app.use('/api/v1/order', orderController);
 
 app.use(handleError);
 

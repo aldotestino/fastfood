@@ -4,7 +4,7 @@ import { Formik, Form } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
-import { SignupVariables, OnSubmitFunc } from '../utils/types';
+import { SignupVariables, OnSubmitFunc, UserRole } from '../utils/types';
 import { SignupSchema } from '../utils/validators';
 import { API_URL } from '../utils/vars';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
-  const { isAuth } = useUserStore();
+  const { isAuth, user } = useUserStore();
 
   const onSubmit: OnSubmitFunc<SignupVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
@@ -51,7 +51,7 @@ function Signup() {
 
   return (
     <Flex py={[0, 10]} align="center" direction="column">
-      {isAuth && <Navigate to="/profile" />}
+      {isAuth && user?.role === UserRole.CUSTOMER ? <Navigate to="/profile" /> : isAuth && user?.role == UserRole.COOK ? <Navigate to="/" /> : null}
       <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
         <Heading mb="6" fontStyle="italic">Signup</Heading>
         <Formik

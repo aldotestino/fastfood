@@ -3,7 +3,7 @@ import Link from './Link';
 import ButtonLink from './ButtonLink';
 import { MenuAlt2Icon } from '@heroicons/react/outline';
 import { RefObject, useRef } from 'react';
-import { User } from '../utils/types';
+import { User, UserRole } from '../utils/types';
 import Cart from './Cart';
 import Avatar from './Avatar';
 
@@ -36,22 +36,27 @@ function SideBar({ isAuth, user, handleLogout }: SideBarProps) {
             <DrawerHeader>
               <HStack>
                 <Avatar user={user} />
-                <Text>Ciao, {user!.customer?.firstName}</Text>
+                <Text>Ciao, {user!.customer?.firstName || user?.cook?.email.split('@')[0]}</Text>
               </HStack>
             </DrawerHeader>}
 
           <DrawerBody>
             <VStack as="ul" alignItems="start" spacing="5">
-              {user !== null && <>
-                <Link to="/profile" onClick={onClose}>Profilo</Link>
+              {user !== null && 
+              <>
+                {user.role !== UserRole.COOK && <Link to="/profile" onClick={onClose}>Profilo</Link>}
                 <ButtonLink action={handleLogout} onClick={onClose}>Logout</ButtonLink>
                 <Divider />
               </>}
-              <Link to="/chi-siamo" fontSize="lg" onClick={onClose}>Chi siamo</Link>
-              <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
-              <Link to="/contatti" fontSize="lg" onClick={onClose}>Contatti</Link>
-              {!isAuth && <Link to="/login" fontSize="lg" onClick={onClose}>Login</Link>}
-              <Cart onClick={onClose} />
+              {user?.role !== UserRole.COOK && 
+                <>
+                  <Link to="/chi-siamo" fontSize="lg" onClick={onClose}>Chi siamo</Link>
+                  <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
+                  <Link to="/contatti" fontSize="lg" onClick={onClose}>Contatti</Link>
+                  {!isAuth && <Link to="/login" fontSize="lg" onClick={onClose}>Login</Link>}
+                  <Cart onClick={onClose} />
+                </>
+              }
             </VStack>
           </DrawerBody>
 

@@ -4,13 +4,13 @@ import { Navigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import OrderCard from '../components/OrderCard';
 import useUserStore from '../store/userStore';
-import { Order, OrderState, UserRole } from '../utils/types';
+import { OrderSummary, OrderState, UserRole } from '../utils/types';
 import { API_URL } from '../utils/vars';
 
-function Profile() {
+function UserProfile() {
 
   const { isAuth, user } = useUserStore();
-  const [orders, setOrders] = useState<Array<Order>>([]);
+  const [orders, setOrders] = useState<Array<OrderSummary>>([]);
 
   useEffect(() => {
     fetch(`${API_URL}/customer/orders`, {
@@ -50,4 +50,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default UserProfile;

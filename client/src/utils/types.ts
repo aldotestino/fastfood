@@ -67,11 +67,21 @@ export enum OrderState {
   CLOSED='CLOSED'
 }
 
-export interface Order {
+export interface OrderSummary {
   id: string
   amount: number,
   state: OrderState,
   dateTime: string
+}
+
+export interface Order extends OrderSummary {
+  customerId: string,
+  cookId: string | null,
+  cook: Cook,
+  items: Array<{
+    quantity: number,
+    item: Item
+  }>
 }
 
 export type OnSubmitFunc<T> = (values: T, formikHelpers: FormikHelpers<T>) => void;

@@ -6,6 +6,8 @@ import CustomError from '../utils/CustomError';
 import { Cookie, ErrorCode, UserRole } from '../utils/types';
 import { authenticateUser } from '../utils/middlewares';
 import { CookSignupSchema, LoginSchema } from '../utils/validators';
+import { aDayInMillis } from '../utils/vars';
+import { OrderState } from '@prisma/client';
 
 const cookController = Router();
 
@@ -65,7 +67,7 @@ cookController.post('/login', async (req, res, next) => {
   });
 
   if(!user) {
-    next(new CustomError('Email inesistente', ErrorCode.INVALID_EMAIL));
+    next(new CustomError('Email inesistente', ErrorCode.EMAIL_NOT_FOUND));
     return;
   }
 
@@ -77,7 +79,7 @@ cookController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.COOK }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token);
+  res.cookie(Cookie.TOKEN, token, { maxAge: aDayInMillis });
 
   res.json({
     success: true,
@@ -109,6 +111,100 @@ cookController.get('/logout', authenticateUser, (req, res, next) => {
     res.json({
       success: true
     });
+  }else {
+    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
+  }
+});
+
+cookController.get('/orders', authenticateUser, async (req, res, next) => {
+  if(req.cook) {
+    const orders = await prisma.order.findMany({
+      where: {
+        OR: [{
+          state: OrderState.PENDING
+        },
+        {
+          cookId: req.cook.id
+        }]
+      },
+      orderBy: {
+        dateTime: 'desc'
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        pendingOrders: orders.filter(order => order.state === OrderState.PENDING),
+        myOrders: orders.filter(order => order.state !== OrderState.PENDING)
+      }
+    });
+  }else {
+    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
+  }
+});
+
+cookController.post('/take-order', authenticateUser, async (req, res, next) => {
+  if(req.cook) {
+    const order = await prisma.order.findUnique({
+      where: {
+        id: req.body.orderId
+      }
+    });
+
+    if(!order || order.state !== OrderState.PENDING) {
+      next(new CustomError('Ordine inesistente o già preso in carico', ErrorCode.VALIDATION_ERROR));
+    }else {
+      const newStateOrder = await prisma.order.update({
+        where: {
+          id: req.body.orderId
+        },
+        data: {
+          cookId: req.cook.id,
+          state: OrderState.TAKEN
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          order: newStateOrder
+        }
+      });
+    }
+  }else {
+    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
+  }
+});
+
+cookController.post('/close-order', authenticateUser, async (req, res, next) => {
+  if(req.cook) {
+    const order = await prisma.order.findUnique({
+      where: {
+        id: req.body.orderId,
+      }
+    });
+
+    if(!order || order.cookId !== req.cook.id) {
+      next(new CustomError('Ordine inesistente o già preso in carico', ErrorCode.VALIDATION_ERROR));
+    }else {
+      const newStateOrder = await prisma.order.update({
+        where: {
+          id: req.body.orderId
+        },
+        data: {
+          cookId: req.cook.id,
+          state: OrderState.CLOSED
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          order: newStateOrder
+        }
+      });
+    }
   }else {
     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
   }

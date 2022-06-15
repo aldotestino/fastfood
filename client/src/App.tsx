@@ -8,12 +8,16 @@ import Login from './views/Login';
 import Signup from './views/Signup';
 import useUserStore from './store/userStore';
 import { useEffect, useState } from 'react';
-import Profile from './views/profile';
+import UserProfile from './views/userProfile';
+import { UserRole } from './utils/types';
+import CookProfile from './views/cookProfile';
+import OrderView from './views/OrderView';
+import LoadingPage from './components/LoadingPage';
 
 function App() {
 
   const [isLoading, setIsLoading] = useState(true);
-  const { fetch } = useUserStore();
+  const { fetch, user } = useUserStore();
 
   useEffect(() => {
     fetch().then(() => setIsLoading(false));
@@ -25,17 +29,22 @@ function App() {
         <Flex minH="100vh" direction="column">
           <NavBar />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />}/>
-            <Route path="/checkout" element={<Checkout />} />
+            {(user === null || user?.role === UserRole.CUSTOMER) ?
+              <>
+                <Route path="/" element={<Home />} />
+                <Route path="/menu" element={<Menu />}/>
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/profile" element={<UserProfile />} />
+              </> : <>
+                <Route path="/" element={<CookProfile />} />
+              </>
+            }
+            <Route path="order/:orderId" element={<OrderView />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<Profile />} />
           </Routes>
         </Flex> : 
-        <Center minH="100vh">
-          <Spinner color="yellow.400" size="xl" />
-        </Center>
+        <LoadingPage />
       }
     </>
   );
