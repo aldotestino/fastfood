@@ -12,6 +12,7 @@ interface LoginApiResponse {
 }
 
 interface LoginApiRequest extends LoginVariables {
+  role: UserRole
   remember: boolean
 }
 

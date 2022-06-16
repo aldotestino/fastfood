@@ -10,7 +10,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import Link from '../components/Link';
-import { Field, FieldProps, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
@@ -23,7 +23,6 @@ import useUserStore from '../store/userStore';
 const initialValues: LoginVariables = {
   email: '',
   password: '',
-  role: UserRole.CUSTOMER,
 };
 
 interface RoleOptions extends OptionBase {
@@ -50,13 +49,16 @@ function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuth, user } = useUserStore();
+  const [role, setRole] = useState<UserRole>(UserRole.CUSTOMER);
   const [remember, setRemember] = useState(false);
   const toast = useToast();
 
   const onSubmit: OnSubmitFunc<LoginVariables> = async (values, { resetForm }) => {
+    console.log(role);
     setIsLoading(true);
     const res = await login({
       ...values,
+      role,
       remember
     });
     setIsLoading(false);
@@ -77,7 +79,7 @@ function Login() {
   return (
     <Flex py={[0, 10]} align="center" direction="column">
       {isAuth && user?.role === UserRole.CUSTOMER ? <Navigate to="/profile" /> : isAuth && user?.role == UserRole.COOK ? <Navigate to="/" /> : null}
-      <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'gray.200']} rounded="lg" p={[5, 8]}>
+      <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'inherit']} rounded="lg" p={[5, 8]}>
         <Heading mb="6" fontStyle="italic">Login</Heading>
         <Formik
           initialValues={initialValues}
@@ -85,7 +87,7 @@ function Login() {
           validationSchema={LoginSchema}
           onSubmit={onSubmit}
         >
-          {({ errors, touched, setFieldValue }) =>
+          {({ errors, touched }) =>
             <Form>
               <Stack spacing="6">
                 <InputField
@@ -108,23 +110,19 @@ function Login() {
                   isInvalid={Boolean(errors.password && touched.password)}
                   isDisabled={isLoading}
                 />
-                <Field name="role">
-                  {({ field }: FieldProps) =>
-                    <FormControl>
-                      <FormLabel>Ruolo</FormLabel>
-                      <Select 
-                        options={roleOptions} 
-                        colorScheme="yellow" 
-                        name={field.name}
-                        defaultValue={roleOptions.find(o => o.value === initialValues.role)} 
-                        onChange={ro => setFieldValue(field.name, ro?.value)} 
-                        focusBorderColor="yellow.400"
-                        selectedOptionStyle='check'
-                        selectedOptionColor='yellow'
-                        isDisabled={isLoading}
-                      />
-                    </FormControl>}
-                </Field>
+                <FormControl>
+                  <FormLabel>Ruolo</FormLabel>
+                  <Select 
+                    options={roleOptions} 
+                    name="role"
+                    defaultValue={roleOptions[0]} 
+                    value={roleOptions.find(o => o.value === role)}
+                    onChange={ro => setRole(ro?.value as UserRole)} 
+                    focusBorderColor="yellow.400"
+                    selectedOptionStyle='check'
+                    isDisabled={isLoading}
+                  />
+                </FormControl>
                 <Checkbox isChecked={remember} onChange={e => setRemember(e.target.checked)} colorScheme="yellow" isDisabled={isLoading}>Ricordami</Checkbox>
                 <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Login</Button>
                 <Link textAlign="center" to="/signup">Non hai un&apos;account?</Link>

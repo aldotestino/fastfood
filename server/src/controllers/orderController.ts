@@ -48,7 +48,7 @@ orderController.get('/:id', authenticateUser, async (req, res, next) => {
     next(new CustomError('Non puoi accedere a questo ordine', ErrorCode.UNAUTHORIZED));
   }else {
     res.json({
-      succeess: true,
+      success: true,
       data: {
         order: order
       }

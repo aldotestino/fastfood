@@ -24,29 +24,26 @@ function App() {
   }, []);
 
   return (
-    <>
+    <Flex minH="100vh" direction="column">
+      <NavBar />
       {!isLoading ? 
-        <Flex minH="100vh" direction="column">
-          <NavBar />
-          <Routes>
-            {(user === null || user?.role === UserRole.CUSTOMER) ?
-              <>
-                <Route path="/" element={<Home />} />
-                <Route path="/menu" element={<Menu />}/>
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/profile" element={<UserProfile />} />
-              </> : <>
-                <Route path="/" element={<CookProfile />} />
-              </>
-            }
-            <Route path="order/:orderId" element={<OrderView />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Routes>
-        </Flex> : 
+        <Routes>
+          {(user === null || user?.role === UserRole.CUSTOMER) ?
+            <>
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />}/>
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profile" element={<UserProfile />} />
+            </> : 
+            <Route path="/" element={<CookProfile />} />
+          }
+          <Route path="order/:orderId" element={<OrderView />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes> : 
         <LoadingPage />
       }
-    </>
+    </Flex> 
   );
 }
 

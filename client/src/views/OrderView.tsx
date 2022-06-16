@@ -22,7 +22,11 @@ function OrderView() {
     fetch(`${API_URL}/order/${orderId}`, {
       credentials: 'include'
     }).then(r => r.json()).then(res => {
-      setOrder(res.data.order);
+      if(res.success) {
+        setOrder(res.data.order);
+      }else {
+        navigate('/profile');
+      }
     });
   }, []);
 
@@ -58,13 +62,13 @@ function OrderView() {
               <HStack>
                 <IconButton onClick={() => navigate(-1)} variant="ghost" aria-label='go back' icon={<ArrowBackIcon w="6" h="6"/>} />
                 <Heading fontStyle="italic">
-                  Ordine 
+                  Ordine
                 </Heading>
               </HStack>
               {user?.role === UserRole.COOK && order.state !== OrderState.CLOSED && (order.state === OrderState.PENDING ? 
                 <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.TAKEN)}>Prendi ordine</Button> : 
                 <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.CLOSED)}>Chiudi ordine</Button>)}
-              {user?.role !== UserRole.COOK && order.cook && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando il tuo ordine.': 'ha chiuso il tuo ordine.'}</Text>}
+              {user?.role !== UserRole.COOK && order.cook && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando il tuo ordine.': 'ha chiuso il tuo ordine.'}</Text>}
             </VStack>
             <OrderCard ml="4" showButton={false} o={order} />
           </Flex>
