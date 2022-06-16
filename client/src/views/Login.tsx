@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   FormLabel,
@@ -9,20 +10,20 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import Link from '../components/Link';
-import { Field, Form, Formik } from 'formik';
+import { Field, FieldProps, Form, Formik } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LoginVariables, OnSubmitFunc, UserRole } from '../utils/types';
 import { OptionBase, Select } from 'chakra-react-select';
 import { LoginSchema } from '../utils/validators';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 
 const initialValues: LoginVariables = {
   email: '',
   password: '',
-  role: UserRole.CUSTOMER
+  role: UserRole.CUSTOMER,
 };
 
 interface RoleOptions extends OptionBase {
@@ -49,14 +50,18 @@ function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuth, user } = useUserStore();
-  const navigate = useNavigate();
+  const [remember, setRemember] = useState(false);
   const toast = useToast();
 
   const onSubmit: OnSubmitFunc<LoginVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
-    const res = await login(values);
+    const res = await login({
+      ...values,
+      remember
+    });
     setIsLoading(false);
     resetForm();
+    setRemember(false);
     if(!res.success) {
       toast({
         title: 'Errore',
@@ -104,20 +109,23 @@ function Login() {
                   isDisabled={isLoading}
                 />
                 <Field name="role">
-                  {({ field }: {field: any}) =>
+                  {({ field }: FieldProps) =>
                     <FormControl>
                       <FormLabel>Ruolo</FormLabel>
                       <Select 
                         options={roleOptions} 
                         colorScheme="yellow" 
-                        defaultValue={roleOptions[0]} 
+                        name={field.name}
+                        defaultValue={roleOptions.find(o => o.value === initialValues.role)} 
                         onChange={ro => setFieldValue(field.name, ro?.value)} 
                         focusBorderColor="yellow.400"
                         selectedOptionStyle='check'
                         selectedOptionColor='yellow'
+                        isDisabled={isLoading}
                       />
                     </FormControl>}
                 </Field>
+                <Checkbox isChecked={remember} onChange={e => setRemember(e.target.checked)} colorScheme="yellow" isDisabled={isLoading}>Ricordami</Checkbox>
                 <Button type="submit" colorScheme="yellow" isLoading={isLoading}>Login</Button>
                 <Link textAlign="center" to="/signup">Non hai un&apos;account?</Link>
               </Stack>

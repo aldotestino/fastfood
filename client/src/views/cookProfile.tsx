@@ -20,6 +20,8 @@ function CookProfile() {
     fetch(`${API_URL}/cook/orders`, {
       credentials: 'include'
     }).then(r => r.json()).then(res => {
+      console.log(res);
+      
       if(res.success) {
         setOrders({
           myOrders: res.data.myOrders,
@@ -45,10 +47,10 @@ function CookProfile() {
         </TabList>
         <TabPanels>
           <TabPanel as={VStack} align="flex-start" divider={<Divider />}>
-            {orders?.pendingOrders.filter(o => o.state === OrderState.PENDING || o.state === OrderState.TAKEN).map(o => <OrderCard key={o.id} {...o} />)}
+            {orders?.pendingOrders.map(o => <OrderCard key={o.id} o={o} />)}
           </TabPanel>
           <TabPanel as={VStack} align="flex-start" divider={<Divider />}>
-            {orders?.myOrders.filter(o => o.state === OrderState.CLOSED).map(o => <OrderCard key={o.id} {...o} />)}
+            {orders?.myOrders.map(o => <OrderCard key={o.id} o={o} />)}
           </TabPanel>
         </TabPanels>
       </Tabs>

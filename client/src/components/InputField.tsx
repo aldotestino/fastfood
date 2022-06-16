@@ -1,5 +1,5 @@
 import { FormControl, As, FormErrorMessage, FormLabel, Icon, Input, InputGroup, InputLeftElement, InputProps } from '@chakra-ui/react';
-import { Field } from 'formik';
+import { Field, FieldProps } from 'formik';
 import React from 'react';
 
 export interface InputFieldProps extends InputProps {
@@ -12,7 +12,7 @@ function InputField({ label, errorMessage, icon, ...rest }: InputFieldProps) {
 
   return (
     <Field name={rest.name}>
-      {({ field }: {field: any}) =>
+      {({ field }: FieldProps) =>
         <FormControl isInvalid={rest.isInvalid}>
           <FormLabel>{label}</FormLabel>
           <InputGroup>

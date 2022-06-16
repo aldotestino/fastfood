@@ -60,7 +60,8 @@ customerController.post('/login', async (req, res, next) => {
     return;
   }
 
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
+  
   const user = await prisma.customer.findUnique({
     where: {
       email
@@ -80,7 +81,7 @@ customerController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.CUSTOMER }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token, { maxAge: aDayInMillis });
+  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined });
 
   res.json({
     success: true,
@@ -135,10 +136,12 @@ customerController.get('/orders', authenticateUser, async (req, res, next) => {
         dateTime: true
       }
     });
+
     res.json({
       success: true,
       data: {
-        orders
+        activeOrders: orders.filter(o => o.state !== OrderState.CLOSED),
+        archivedOrders: orders.filter(o => o.state === OrderState.CLOSED)
       }
     });
   }else {
@@ -200,44 +203,5 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
   }
 });
-
-// customerController.get('/orders', authenticateUser, async (req, res, next) => {
-//   if(req.customer) {
-//     const orders = await prisma.order.findMany({
-//       where: {
-//         customerId: req.customer.id
-//       },
-//       select: {
-//         state: true,
-//         amuount: true,
-//         cook: {
-//           select: {
-//             id: true
-//           }
-//         },
-//         items: {
-//           select: {
-//             quantity: true,
-//             item: {
-//               select: {
-//                 name: true,
-//                 price: true,
-//                 imageUrl: true
-//               }
-//             }
-//           }
-//         }
-//       }
-//     });
-//     res.json({
-//       success: true,
-//       data: {
-//         orders
-//       }
-//     });
-//   }else {
-//     next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-//   }
-// });
 
 export default customerController;

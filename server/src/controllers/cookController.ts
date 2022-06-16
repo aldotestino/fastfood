@@ -132,11 +132,14 @@ cookController.get('/orders', authenticateUser, async (req, res, next) => {
       }
     });
 
+    const pendingOrders = orders.filter(order => order.state === OrderState.PENDING);
+    const myOrders = orders.filter(order => order.state !== OrderState.PENDING);
+
     res.json({
       success: true,
       data: {
-        pendingOrders: orders.filter(order => order.state === OrderState.PENDING),
-        myOrders: orders.filter(order => order.state !== OrderState.PENDING)
+        pendingOrders,
+        myOrders
       }
     });
   }else {

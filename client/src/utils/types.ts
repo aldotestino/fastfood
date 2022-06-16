@@ -33,7 +33,7 @@ export enum UserRole {
 export interface LoginVariables {
   email: string
   password: string,
-  role: UserRole
+  role: UserRole,
 }
 
 export interface SignupVariables {

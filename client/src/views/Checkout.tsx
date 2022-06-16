@@ -18,7 +18,8 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useDisclosure,
-  useToast
+  useToast,
+  Flex
 } from '@chakra-ui/react';
 import Link from '../components/Link';
 import useCartStore from '../store/cartStore';
@@ -69,7 +70,10 @@ function Checkout() {
   return (
     <>
       <TableContainer px={[0, 5, 10, 20]} py={[5, 10]}>
-        <Heading ml={[5, 0]} mb="6" fontStyle="italic">Checkout</Heading>
+        <Flex justify="space-between">
+          <Heading ml={[5, 0]} mb="6" fontStyle="italic">Checkout</Heading>
+          {items.length > 0 && <Button onClick={clearCart} colorScheme="red">Svuota carrello</Button>}
+        </Flex>
         <Table variant="striped">
           {items.length === 0 && <TableCaption>Il carrello è vuoto</TableCaption>}
           <Thead>
@@ -89,14 +93,16 @@ function Checkout() {
             <Tr>
               {isDesktop && <><Td></Td><Td></Td></>}
               <Td isNumeric={isDesktop} fontWeight="bold">
-              Importo totale
+                Importo totale
               </Td>
               <Td isNumeric fontWeight="bold">{total().toFixed(2)} €</Td>
             </Tr>
             <Tr>
               {isDesktop && <><Td borderBottom="none"></Td><Td borderBottom="none"></Td></>}
               <Td borderBottom="none"></Td>
-              <Td isNumeric borderBottom="none"><Button onClick={onOpen} colorScheme="yellow">Checkout</Button></Td>
+              <Td isNumeric borderBottom="none">
+                <Button onClick={onOpen} colorScheme="yellow">Checkout</Button>
+              </Td>
             </Tr>
           </Tfoot>}
         </Table>

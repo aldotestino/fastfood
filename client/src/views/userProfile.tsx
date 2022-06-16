@@ -4,20 +4,28 @@ import { Navigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import OrderCard from '../components/OrderCard';
 import useUserStore from '../store/userStore';
-import { OrderSummary, OrderState, UserRole } from '../utils/types';
+import { OrderSummary, UserRole } from '../utils/types';
 import { API_URL } from '../utils/vars';
+
+interface UserOrders {
+  activeOrders: Array<OrderSummary>
+  archivedOrders: Array<OrderSummary>
+}
 
 function UserProfile() {
 
   const { isAuth, user } = useUserStore();
-  const [orders, setOrders] = useState<Array<OrderSummary>>([]);
+  const [orders, setOrders] = useState<UserOrders>();
 
   useEffect(() => {
     fetch(`${API_URL}/customer/orders`, {
       credentials: 'include'
     }).then(r => r.json()).then(res => {
       if(res.success) {
-        setOrders(res.data.orders);
+        setOrders({
+          activeOrders: res.data.activeOrders,
+          archivedOrders: res.data.archivedOrders
+        });
       }
     });
   }, []);
@@ -39,10 +47,10 @@ function UserProfile() {
         </TabList>
         <TabPanels>
           <TabPanel as={VStack} align="flex-start" divider={<Divider />}>
-            {[...orders].filter(o => o.state === OrderState.PENDING || o.state === OrderState.TAKEN).map(o => <OrderCard key={o.id} {...o} />)}
+            {orders?.activeOrders.map(o => <OrderCard key={o.id} o={o} />)}
           </TabPanel>
           <TabPanel as={VStack} align="flex-start" divider={<Divider />}>
-            {[...orders].filter(o => o.state === OrderState.CLOSED).map(o => <OrderCard key={o.id} {...o} />)}
+            {orders?.archivedOrders.map(o => <OrderCard key={o.id} o={o} />)}
           </TabPanel>
         </TabPanels>
       </Tabs>

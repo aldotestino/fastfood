@@ -11,6 +11,10 @@ interface LoginApiResponse {
   }
 }
 
+interface LoginApiRequest extends LoginVariables {
+  remember: boolean
+}
+
 interface LogoutApiResponse {
   success: boolean
   data?: {
@@ -22,7 +26,7 @@ interface UserStore {
   user: User | null,
   isAuth: boolean,
   fetch: () => Promise<null>
-  login: (values: LoginVariables) => Promise<LoginApiResponse>
+  login: (values: LoginApiRequest) => Promise<LoginApiResponse>
   logout: () => Promise<LogoutApiResponse>
 }
 
