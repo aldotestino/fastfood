@@ -1,11 +1,12 @@
 import { Box, Heading, HStack, VStack, Text, Tabs, TabList, TabPanels, TabPanel, Tab, Divider, Spinner, Center } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import Avatar from '../components/Avatar';
-import LoadingPage from '../components/LoadingPage';
 import OrderCard from '../components/OrderCard';
+import { useSocket } from '../SocketProvider';
 import useUserStore from '../store/userStore';
-import { OrderSummary } from '../utils/types';
+import { NewOrderSocketEVent, OrderChangeSocketEvent, OrderSummary } from '../utils/types';
 import { API_URL } from '../utils/vars';
 
 interface UserOrders {
@@ -13,11 +14,15 @@ interface UserOrders {
   archivedOrders: Array<OrderSummary>
 }
 
-function UserProfile() {
+function CustomerProfile() {
 
   const { isAuth, user } = useUserStore();
-  const [orders, setOrders] = useState<UserOrders>();
+  const [orders, setOrders] = useState<UserOrders>({
+    activeOrders: [],
+    archivedOrders: []
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const ioSocket = useSocket();
 
   useEffect(() => {
     fetch(`${API_URL}/customer/orders`, {
@@ -32,6 +37,59 @@ function UserProfile() {
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if(ioSocket?.current) {
+
+      ioSocket.current.addListener('new-order', (data: NewOrderSocketEVent) => {
+        const newOrder: OrderSummary = {
+          id: data.orderId,
+          amount: data.amount,
+          dateTime: data.dateTime,
+          state: data.state
+        };
+
+        setOrders(ps => ({
+          ...ps,
+          activeOrders: [newOrder, ...ps.activeOrders]
+        }));
+      });
+
+      ioSocket.current?.addListener('order-taken', (data: OrderChangeSocketEvent) => {
+        const newActiveOrders = orders.activeOrders.map(o => {
+          if(o.id === data.orderId) {
+            o.state = data.state;
+          }
+          return o;
+        });
+
+        setOrders(ps => ({
+          ...ps,
+          activeOrders: newActiveOrders
+        }));
+      });
+
+      ioSocket.current?.addListener('order-closed', (data: OrderChangeSocketEvent) => {
+        const closedOrder = orders.activeOrders.find(o => o.id === data.orderId);
+        if(closedOrder) {
+          closedOrder.state = data.state;
+          const newActiveOrders = orders.activeOrders.filter(o => o.id !== data.orderId);
+          const newArchivedOrders = [closedOrder, ...orders.archivedOrders];
+          setOrders({
+            activeOrders: newActiveOrders,
+            archivedOrders: newArchivedOrders
+          });
+        }
+      });
+    }
+
+
+    return () => {
+      if(ioSocket?.current) {
+        ioSocket.current.removeAllListeners();
+      }
+    };
+  }, [orders]);
 
   return (
     <Box px={[5, 5, 10, 20]} py={[5, 10]}>
@@ -65,4 +123,4 @@ function UserProfile() {
   );
 }
 
-export default UserProfile;
+export default CustomerProfile;

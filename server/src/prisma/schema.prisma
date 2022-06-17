@@ -47,8 +47,8 @@ enum ItemType {
 
 model Order {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  customer   Customer?   @relation(fields: [customerId], references: [id])
-  customerId String?
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  customerId String
   dateTime   DateTime    @default(now())
   state      OrderState
   items      OrderItem[]

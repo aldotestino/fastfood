@@ -1,4 +1,4 @@
-import { Center, Flex, Spinner } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import { Route, Routes } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './views/Home';
@@ -8,7 +8,7 @@ import Login from './views/Login';
 import Signup from './views/Signup';
 import useUserStore from './store/userStore';
 import { useEffect, useState } from 'react';
-import UserProfile from './views/userProfile';
+import CustomerProfile from './views/customerProfile';
 import { UserRole } from './utils/types';
 import CookProfile from './views/cookProfile';
 import OrderView from './views/OrderView';
@@ -18,7 +18,6 @@ function App() {
 
   const [isLoading, setIsLoading] = useState(true);
   const { fetch, user } = useUserStore();
-
   useEffect(() => {
     fetch().then(() => setIsLoading(false));
   }, []);
@@ -33,7 +32,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />}/>
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/profile" element={<CustomerProfile />} />
             </> : 
             <Route path="/" element={<CookProfile />} />
           }

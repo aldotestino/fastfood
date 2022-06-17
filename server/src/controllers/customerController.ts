@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import e, { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
@@ -176,10 +176,17 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
 
     const newOrder = await prisma.order.create({
       data: {
-        customerId: req.customer.id,
+        customerId: req.customer.id!,
         state: OrderState.PENDING,
         amount: itemsWithQuantity.reduce((sum, c) => sum += c.price*c.quantity, 0)
       }
+    });
+
+    req.ioSocket.emit('new-order', {
+      orderId: newOrder.id,
+      state: newOrder.state,
+      amount: newOrder.amount,
+      dateTime: newOrder.dateTime
     });
 
     const newOrderItems = await prisma.orderItem.createMany({

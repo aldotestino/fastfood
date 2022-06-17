@@ -7,7 +7,7 @@ import { Cookie, ErrorCode, UserRole } from '../utils/types';
 import { authenticateUser } from '../utils/middlewares';
 import { CookSignupSchema, LoginSchema } from '../utils/validators';
 import { aDayInMillis } from '../utils/vars';
-import { OrderState } from '@prisma/client';
+import { Order, OrderState } from '@prisma/client';
 
 const cookController = Router();
 
@@ -158,7 +158,7 @@ cookController.post('/take-order', authenticateUser, async (req, res, next) => {
     if(!order || order.state !== OrderState.PENDING) {
       next(new CustomError('Ordine inesistente o già preso in carico', ErrorCode.VALIDATION_ERROR));
     }else {
-      const newStateOrder = await prisma.order.update({
+      const orderNewState: Order = await prisma.order.update({
         where: {
           id: req.body.orderId
         },
@@ -168,10 +168,24 @@ cookController.post('/take-order', authenticateUser, async (req, res, next) => {
         }
       });
 
+      req.ioSocket.emit(orderNewState.customerId, {
+        orderId: orderNewState.id,
+        state: orderNewState.state,
+        cookEmail: req.cook.email,
+        cookId: req.cook.id
+      });
+
+      req.ioSocket.emit('order-taken', {
+        orderId: orderNewState.id,
+        state: orderNewState.state,
+        cookEmail: req.cook.email,
+        cookId: req.cook.id
+      });
+
       res.json({
         success: true,
         data: {
-          order: newStateOrder
+          order: orderNewState
         }
       });
     }
@@ -191,7 +205,7 @@ cookController.post('/close-order', authenticateUser, async (req, res, next) => 
     if(!order || order.cookId !== req.cook.id) {
       next(new CustomError('Ordine inesistente o già preso in carico', ErrorCode.VALIDATION_ERROR));
     }else {
-      const newStateOrder = await prisma.order.update({
+      const orderNewState = await prisma.order.update({
         where: {
           id: req.body.orderId
         },
@@ -201,10 +215,24 @@ cookController.post('/close-order', authenticateUser, async (req, res, next) => 
         }
       });
 
+      req.ioSocket.emit(orderNewState.customerId, {
+        orderId: orderNewState.id,
+        state: orderNewState.state,
+        cookEmail: req.cook.email,
+        cookId: req.cook.id
+      });
+
+      req.ioSocket.emit(req.cook.id, {
+        orderId: orderNewState.id,
+        state: orderNewState.state,
+        cookEmail: req.cook.email,
+        cookId: req.cook.id
+      });
+
       res.json({
         success: true,
         data: {
-          order: newStateOrder
+          order: orderNewState
         }
       });
     }

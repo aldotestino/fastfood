@@ -54,7 +54,6 @@ function Login() {
   const toast = useToast();
 
   const onSubmit: OnSubmitFunc<LoginVariables> = async (values, { resetForm }) => {
-    console.log(role);
     setIsLoading(true);
     const res = await login({
       ...values,

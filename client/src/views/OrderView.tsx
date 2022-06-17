@@ -6,17 +6,32 @@ import LoadingPage from '../components/LoadingPage';
 import OrderCard from '../components/OrderCard';
 import OrderItem from '../components/OrderItem';
 import useUserStore from '../store/userStore';
-import { Order, OrderState, UserRole } from '../utils/types';
+import { Order, OrderChangeSocketEvent, OrderState, UserRole } from '../utils/types';
 import { API_URL } from '../utils/vars';
+import { m } from 'framer-motion';
+import { useSocket } from '../SocketProvider';
+import { io } from 'socket.io-client';
 
 function OrderView() {
 
   const { orderId } = useParams();
-  const [order, setOrder] = useState<Order>();
+  const [order, setOrder] = useState<Order>({
+    amount: 0,
+    cook: {
+      id: '',
+      email: ''
+    },
+    customerId: '',
+    dateTime: '',
+    id: '',
+    items: [],
+    state: OrderState.PENDING
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUserStore();
   const navigate = useNavigate();
   const [isDesktop] = useMediaQuery('(min-width: 48em)');
+  const ioSocket = useSocket();
 
   useEffect(() => {
     fetch(`${API_URL}/order/${orderId}`, {
@@ -25,10 +40,43 @@ function OrderView() {
       if(res.success) {
         setOrder(res.data.order);
       }else {
-        navigate('/profile');
+        navigate(user?.customer ? '/profile': '/');
       }
     });
   }, []);
+
+
+  useEffect(() => {
+    if(ioSocket?.current) {
+      ioSocket.current.addListener('order-taken', (data: OrderChangeSocketEvent) => {
+        if(user?.cook && user.cook.id !== data.cookId) {
+          navigate('/');
+        }
+
+        setOrder(ps => ({
+          ...ps,
+          cook: {
+            email: data.cookEmail,
+            id: data.cookId
+          },
+          state: data.state,
+        }));
+      });
+
+      ioSocket.current.addListener('order-closed', (data: OrderChangeSocketEvent) => {
+        setOrder(ps => ({
+          ...ps,
+          state: data.state
+        }));
+      });
+    }
+
+    return () => {
+      if(ioSocket?.current) {
+        ioSocket.current.removeAllListeners();
+      }
+    };
+  }, [order]);
 
   async function changeOrderState(state: OrderState.TAKEN | OrderState.CLOSED) {
     const changeState = {
@@ -47,20 +95,19 @@ function OrderView() {
     setIsLoading(false);
     if(res.success) {
       setOrder(ps => ({
-        ...ps!,
+        ...ps,
         state: res.data.order.state
       }));
     }
   }
-  
   return (
     <>
-      {order !== null && order !== undefined ? 
+      {!isLoading ? 
         <Box px={[5, 5, 10, 20]} py={[5, 10]}>
           <Flex w="100%" justify="space-between" mb="6">
             <VStack spacing={2} align="flex-start">
               <HStack>
-                <IconButton onClick={() => navigate(-1)} variant="ghost" aria-label='go back' icon={<ArrowBackIcon w="6" h="6"/>} />
+                <IconButton onClick={() => navigate(user?.cook ? '/' : '/profile')} variant="ghost" aria-label='go back' icon={<ArrowBackIcon w="6" h="6"/>} />
                 <Heading fontStyle="italic">
                   Ordine
                 </Heading>

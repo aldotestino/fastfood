@@ -75,12 +75,25 @@ export interface OrderSummary {
 
 export interface Order extends OrderSummary {
   customerId: string,
-  cookId: string | null,
   cook: Cook,
   items: Array<{
     quantity: number,
     item: Item
   }>
+}
+
+export interface OrderChangeSocketEvent {
+  orderId: string
+  state: OrderState
+  cookEmail: string
+  cookId: string
+}
+
+export interface NewOrderSocketEVent {
+  orderId: string
+  state: OrderState
+  amount: number
+  dateTime: string
 }
 
 export type OnSubmitFunc<T> = (values: T, formikHelpers: FormikHelpers<T>) => void;

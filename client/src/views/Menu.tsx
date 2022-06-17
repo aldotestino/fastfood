@@ -1,5 +1,5 @@
 import { Item, ItemType } from '../utils/types';
-import { Box, Heading, GridItem, SimpleGrid, VStack, Divider } from '@chakra-ui/react';
+import { Box, Heading, GridItem, SimpleGrid, VStack } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
 import { useEffect, useState } from 'react';
 import { API_URL } from '../utils/vars';

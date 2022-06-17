@@ -1,9 +1,10 @@
-import { Box, Heading, HStack, VStack, Text, Tabs, TabList, TabPanels, TabPanel, Tab, Divider, Center, Spinner } from '@chakra-ui/react';
+import { Box, Heading, HStack, VStack, Tabs, TabList, TabPanels, TabPanel, Tab, Divider, Center, Spinner } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import OrderCard from '../components/OrderCard';
+import { useSocket } from '../SocketProvider';
 import useUserStore from '../store/userStore';
-import { OrderSummary } from '../utils/types';
+import { NewOrderSocketEVent, OrderChangeSocketEvent, OrderState, OrderSummary } from '../utils/types';
 import { API_URL } from '../utils/vars';
 
 interface Orders {
@@ -14,8 +15,12 @@ interface Orders {
 function CookProfile() {
 
   const { isAuth, user } = useUserStore();
-  const [orders, setOrders] = useState<Orders>();
+  const [orders, setOrders] = useState<Orders>({
+    myOrders: [],
+    pendingOrders: []
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const ioSocket = useSocket();
 
   useEffect(() => {
     fetch(`${API_URL}/cook/orders`, {
@@ -30,6 +35,59 @@ function CookProfile() {
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if(ioSocket?.current) {
+      ioSocket.current.addListener('new-order', (data: NewOrderSocketEVent) => {
+        const newOrder: OrderSummary = {
+          id: data.orderId,
+          amount: data.amount,
+          dateTime: data.dateTime,
+          state: data.state
+        };
+
+        setOrders(ps => ({
+          ...ps,
+          pendingOrders: [newOrder, ...ps.pendingOrders]
+        }));
+      });
+
+      ioSocket.current.addListener('order-taken', (data: OrderChangeSocketEvent) => {
+        const takenOrder = orders.pendingOrders.find(o => o.id === data.orderId);
+        const newPendingOrders = orders.pendingOrders.filter(o => o.id !== data.orderId);
+        let myNewOrders = orders.myOrders;
+        if(user?.cook && data.cookId === user.cook.id && takenOrder) {
+          takenOrder.state = data.state;
+          myNewOrders = [takenOrder, ...orders.myOrders];
+        }
+
+        setOrders({
+          myOrders: myNewOrders,
+          pendingOrders: newPendingOrders
+        });
+      });
+
+      ioSocket.current.addListener('order-closed', (data: OrderChangeSocketEvent) => {
+        const myNewOrders = orders.myOrders.map(o => {
+          if(o.id === data.orderId) {
+            o.state = data.state;
+          }
+          return o;
+        });
+
+        setOrders(ps => ({
+          ...ps,
+          myOrders: myNewOrders
+        }));
+      });
+    }
+
+    return () => {
+      if(ioSocket?.current) {
+        ioSocket.current.removeAllListeners();
+      }
+    };
+  }, [orders]);
 
   return (
     <Box px={[5, 5, 10, 20]} py={[5, 10]}>

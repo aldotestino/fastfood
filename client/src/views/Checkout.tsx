@@ -58,7 +58,7 @@ function Checkout() {
       clearCart();
       toast({
         title: 'Ordine creato',
-        description: <Text>Visualizza lo stato dell&apos;ordine nel <Link noColor to='/profile'>tuo profilo</Link></Text>,
+        description: <Text>Visualizza lo stato <Link noColor to={`/order/${res.data.order.id}`}>del tuo ordine</Link></Text>,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -72,7 +72,7 @@ function Checkout() {
       <TableContainer px={[0, 5, 10, 20]} py={[5, 10]}>
         <Flex justify="space-between">
           <Heading ml={[5, 0]} mb="6" fontStyle="italic">Checkout</Heading>
-          {items.length > 0 && <Button onClick={clearCart} colorScheme="red">Svuota carrello</Button>}
+          {items.length > 0 && <Button mr={[5, 0]} onClick={clearCart} colorScheme="red">Svuota carrello</Button>}
         </Flex>
         <Table variant="striped">
           {items.length === 0 && <TableCaption>Il carrello è vuoto</TableCaption>}
