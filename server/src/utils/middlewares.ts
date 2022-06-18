@@ -5,10 +5,11 @@ import prisma from '../lib/prisma';
 import { Cookie, ErrorCode, UserRole } from '../utils/types';
 
 async function authenticateUser(req: Request, res: Response, next: NextFunction) {
-  if(!(Cookie.TOKEN in req.cookies)) {
+  const cookie = req.cookies[Cookie.TOKEN];
+  if(!cookie) {
     next(new CustomError('Autenticazione necessaria', ErrorCode.UNAUTHORIZED));
   }else {
-    const token= jwt.verify(req.cookies[Cookie.TOKEN], process.env.JWT_SECRET!) as JwtPayload;
+    const token = jwt.verify(req.cookies[Cookie.TOKEN], process.env.JWT_SECRET!) as JwtPayload;
 
     if(!token || !token.id && !token.role) {
       next(new CustomError('Token errato', ErrorCode.UNAUTHORIZED));
@@ -27,6 +28,7 @@ async function authenticateUser(req: Request, res: Response, next: NextFunction)
         });
 
         if(!user) {
+          res.clearCookie(Cookie.TOKEN);
           next(new CustomError('Utente inesistente', ErrorCode.UNAUTHORIZED));
         }else {
           req.customer = user;
@@ -45,13 +47,22 @@ async function authenticateUser(req: Request, res: Response, next: NextFunction)
         });
 
         if(!user) {
+          res.clearCookie(Cookie.TOKEN);
           next(new CustomError('Utente inesistente', ErrorCode.UNAUTHORIZED));
         }else {
           req.cook = user;
           next();
         }
-
-      }    
+      }else {
+        const { ROOT_ID } = process.env;
+        if(token.id === ROOT_ID) {
+          req.isAdmin = true;
+          next();
+        }else {
+          res.clearCookie(Cookie.TOKEN);
+          next(new CustomError('Utente inesistente', ErrorCode.UNAUTHORIZED));
+        }
+      }
     }
   }
 }

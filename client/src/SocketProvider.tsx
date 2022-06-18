@@ -2,7 +2,7 @@ import { createContext, MutableRefObject, ReactNode, useContext, useEffect, useR
 import { Text, useToast } from '@chakra-ui/react';
 import socketio, { Socket } from 'socket.io-client';
 import useUserStore from './store/userStore';
-import { OrderChangeSocketEvent, NewOrderSocketEVent, OrderState } from './utils/types';
+import { OrderChangeSocketEvent, NewOrderSocketEVent, OrderState, UserRole } from './utils/types';
 import { SERVER_URL } from './utils/vars';
 import Link from './components/Link';
 import { EventEmitter } from 'fbemitter';
@@ -25,16 +25,16 @@ function SocketProvider({ children }: SocketProviderProps) {
   const toast = useToast();
 
   useEffect(() => {
-    if(user?.cook || user?.customer) {
+    if(user !== null) {
       if(ioSocket.current === null || ioSocket.current === undefined) {
         ioSocket.current = socketio(SERVER_URL);
       }
 
-      ioSocket.current?.on('new-order', (data: NewOrderSocketEVent) => {
+      ioSocket.current.on('new-order', (data: NewOrderSocketEVent) => {
         emitter.current?.emit('new-order', data);
       });
 
-      if(user.customer) {
+      if(user.role === UserRole.CUSTOMER && user.customer) {
         ioSocket.current.on(user.customer.id, (data: OrderChangeSocketEvent) => {
 
           if(data.state === OrderState.TAKEN) {
@@ -62,13 +62,22 @@ function SocketProvider({ children }: SocketProviderProps) {
           });
 
         });
-      }else if(user.cook) {
+      }else if(user.role === UserRole.COOK && user.cook) {
 
-        ioSocket.current?.on('order-taken', (data: OrderChangeSocketEvent) => {
+        ioSocket.current.on('order-taken', (data: OrderChangeSocketEvent) => {
           emitter.current?.emit('order-taken', data);
         });
 
-        ioSocket.current?.on(user.cook?.id, (data: OrderChangeSocketEvent) => {
+        ioSocket.current.on(user.cook?.id, (data: OrderChangeSocketEvent) => {
+          emitter.current?.emit('order-closed', data);
+        });
+
+      }else if(user.role === UserRole.ADMIN && user.admin) {
+        ioSocket.current.on('order-taken', (data: OrderChangeSocketEvent) => {
+          emitter.current?.emit('order-taken', data);
+        });
+
+        ioSocket.current.on(user.admin.id, (data: OrderChangeSocketEvent) => {
           emitter.current?.emit('order-closed', data);
         });
       }

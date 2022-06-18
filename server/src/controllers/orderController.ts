@@ -6,6 +6,36 @@ import { ErrorCode } from '../utils/types';
 
 const orderController = Router();
 
+orderController.get('/', authenticateUser, async (req, res, next) => {
+  if(!req.isAdmin) {
+    next(new CustomError('Per accedere a questa pagina devi essere amministratore', ErrorCode.UNAUTHORIZED));
+  }else {
+    const orders = await prisma.order.findMany({
+      select: {
+        id: true,
+        state: true,
+        dateTime: true,
+        amount: true,
+        customer: {
+          select: {
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        dateTime: 'desc'
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        orders
+      }
+    });
+  }
+});
+
 orderController.get('/:id', authenticateUser, async (req, res, next) => {
   const order = await prisma.order.findFirst({
     where: {
@@ -14,7 +44,12 @@ orderController.get('/:id', authenticateUser, async (req, res, next) => {
     select: {
       state: true,
       amount: true,
-      customerId: true,
+      customer: {
+        select: {
+          id: true,
+          email: true
+        }
+      },
       dateTime: true,
       cookId: true,
       id: true,
@@ -42,7 +77,7 @@ orderController.get('/:id', authenticateUser, async (req, res, next) => {
     }
   });
 
-  if(!order || (req.customer && order?.customerId !== req.customer.id)) {
+  if(!order || (req.customer && order?.customer.id !== req.customer.id)) {
     next(new CustomError('Ordine inesistente', ErrorCode.ORDER_NOT_FOUND));
   }else if(req.cook && order.cookId && order.cookId !== req.cook.id) {
     next(new CustomError('Non puoi accedere a questo ordine', ErrorCode.UNAUTHORIZED));

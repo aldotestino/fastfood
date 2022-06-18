@@ -2,25 +2,8 @@ import { CheckIcon, CloseIcon, TimeIcon  } from '@chakra-ui/icons';
 import { Stat, StatHelpText, StatLabel, StatNumber, Tag, TagLabel, TagLeftIcon, Button, HStack, StackProps } from '@chakra-ui/react';
 import { Link as RLink } from 'react-router-dom';
 import { formatDate } from '../utils';
-import { OrderSummary, OrderState } from '../utils/types';
-
-const tagProps = {
-  [OrderState.PENDING]: {
-    description: 'In attesa',
-    color: 'yellow',
-    icon: TimeIcon
-  },
-  [OrderState.TAKEN]: {
-    description: 'In preparazione',
-    color: 'green',
-    icon: CheckIcon
-  },
-  [OrderState.CLOSED]: {
-    description: 'Chiuso',
-    color: 'red',
-    icon: CloseIcon
-  }
-};
+import { OrderSummary } from '../utils/types';
+import { tagProps } from '../utils/vars';
 
 interface OrderCardProps extends StackProps {
   o: OrderSummary,

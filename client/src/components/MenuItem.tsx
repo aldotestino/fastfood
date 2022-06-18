@@ -6,10 +6,16 @@ import shortid from 'shortid';
 import { Item, ItemType } from '../utils/types';
 import Ingredients from './Ingredients';
 import { IMAGE_URL } from '../utils/vars';
+import { EditIcon } from '@chakra-ui/icons';
 
 const MAX_QUANTITY = 10;
 
-function MenuItem(item: Item) {
+interface MenuItemProps {
+  item: Item
+  isAdmin: boolean
+}
+
+function MenuItem({ item, isAdmin }: MenuItemProps) {
 
   const imageUrl = `${IMAGE_URL}/${item.imageUrl}`;
 
@@ -47,6 +53,10 @@ function MenuItem(item: Item) {
     });
   }
 
+  function handleChangeItem() {
+    console.log(`modifica elmento ${item.id}`);
+  }
+
   return (
     <VStack>
       <Image alt={item.name} h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={imageUrl}/>
@@ -55,13 +65,16 @@ function MenuItem(item: Item) {
           {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
           <Text fontSize="xl">{item.name} - {item.price.toFixed(2)} €</Text>
         </HStack>
-        <HStack maxW="150px">
+        {!isAdmin && <HStack maxW="150px">
           <Button onClick={decrement}>-</Button>
           <label htmlFor="quantity" hidden></label>
           <Input value={quantity} name="quantity" type="number" min={1} max={10} onChange={onInputChange} />
           <Button onClick={increment}>+</Button>
-        </HStack>
-        <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button>
+        </HStack>}
+        {!isAdmin ? 
+          <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button> :
+          <Button leftIcon={<Icon as={EditIcon} />} onClick={handleChangeItem} colorScheme="yellow">Modifica</Button> 
+        }
       </VStack>
     </VStack>
   );

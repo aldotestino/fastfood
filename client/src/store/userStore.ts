@@ -31,24 +31,23 @@ interface UserStore {
   logout: () => Promise<LogoutApiResponse>
 }
 
-const useStore = create<UserStore>((setState, getState) => ({
+const useStore = create<UserStore>(setState => ({
   user: null,
   isAuth: false,
   fetch: async () => {
-    const userRole = localStorage.getItem('user-role') as UserRole;
-    if(!userRole) {
-      return null;
-    }
-    const res = await fetch(`${API_URL}/${userRole.toLowerCase()}/me`, {
+    const res = await fetch(`${API_URL}/user/me`, {
       credentials: 'include'
-    }).then(r => r.json());
+    }).then(r => r.json()); 
     if(res.success) {
       setState({
         isAuth: true,
         user: {
-          role: userRole,
-          customer: userRole === UserRole.CUSTOMER ? res.data.user : null,
-          cook: userRole === UserRole.COOK ? res.data.user : null
+          role: res.data.role,
+          customer: res.data.role === UserRole.CUSTOMER ? res.data.user : null,
+          cook: res.data.role === UserRole.COOK ? res.data.user : null,
+          admin: res.data.role === UserRole.ADMIN ? {
+            id: res.data.id
+          } : null
         }
       });
     }
@@ -65,25 +64,25 @@ const useStore = create<UserStore>((setState, getState) => ({
       body: JSON.stringify(values)
     }).then(r => r.json());
     if(res.success) {
-      localStorage.setItem('user-role', role);
       setState({
         isAuth: true,
         user: {
           role,
           customer: role === UserRole.CUSTOMER ? res.data.user : null,
-          cook: role === UserRole.COOK ? res.data.user: null
+          cook: role === UserRole.COOK ? res.data.user: null,
+          admin: role === UserRole.ADMIN ? {
+            id: res.data.id
+          } : null
         }
       });
+      return res; 
     }
-    return res;
   },
   logout: async () => {
-    const userRole = getState().user?.role.toLowerCase();
-    const res = await fetch(`${API_URL}/${userRole}/logout`, {
+    const res = await fetch(`${API_URL}/user/logout`, {
       credentials: 'include',
     }).then(r => r.json());
     if(res.success) {
-      localStorage.removeItem('user-role');
       setState({ user: null, isAuth: false });
     }
     return res;

@@ -13,11 +13,13 @@ import { UserRole } from './utils/types';
 import CookProfile from './views/cookProfile';
 import OrderView from './views/OrderView';
 import LoadingPage from './components/LoadingPage';
+import Cooks from './views/Cooks';
+import Transactions from './views/transactions';
 
 function App() {
 
   const [isLoading, setIsLoading] = useState(true);
-  const { fetch, user } = useUserStore();
+  const { fetch, user, isAuth } = useUserStore();
   useEffect(() => {
     fetch().then(() => setIsLoading(false));
   }, []);
@@ -27,14 +29,22 @@ function App() {
       <NavBar />
       {!isLoading ? 
         <Routes>
-          {(user === null || user?.role === UserRole.CUSTOMER) ?
+          {!isAuth || user?.role === UserRole.CUSTOMER ? 
             <>
               <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<Menu />}/>
+              <Route path="/menu" element={<Menu />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<CustomerProfile />} />
-            </> : 
-            <Route path="/" element={<CookProfile />} />
+            </>
+            : user?.role === UserRole.COOK ?
+              <>
+                <Route path="/" element={<CookProfile />} />
+              </> :
+              <>
+                <Route path="/" element={<Transactions />} />
+                <Route path="/menu" element={<Menu />} />
+                <Route path="/cooks" element={<Cooks />} />
+              </>
           }
           <Route path="order/:orderId" element={<OrderView />} />
           <Route path="/login" element={<Login />} />

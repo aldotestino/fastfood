@@ -77,7 +77,7 @@ function Login() {
 
   return (
     <Flex py={[0, 10]} align="center" direction="column">
-      {isAuth && user?.role === UserRole.CUSTOMER ? <Navigate to="/profile" /> : isAuth && user?.role == UserRole.COOK ? <Navigate to="/" /> : null}
+      {isAuth && user?.role === UserRole.CUSTOMER ? <Navigate to="/profile" /> : isAuth && (user?.role == UserRole.COOK || user?.role == UserRole.ADMIN) ? <Navigate to="/" /> : null}
       <Box border={['none', '1px']} w={['100%', 'md']} borderColor={['', 'inherit']} rounded="lg" p={[5, 8]}>
         <Heading mb="6" fontStyle="italic">Login</Heading>
         <Formik

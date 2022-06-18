@@ -31,7 +31,7 @@ function SideBar({ isAuth, user, handleLogout }: SideBarProps) {
         <DrawerContent>
           <DrawerCloseButton />
 
-          {!isAuth ? 
+          {!isAuth || user?.role === UserRole.ADMIN ? 
             <DrawerHeader>Naviga</DrawerHeader> : 
             <DrawerHeader>
               <HStack>
@@ -42,20 +42,33 @@ function SideBar({ isAuth, user, handleLogout }: SideBarProps) {
 
           <DrawerBody>
             <VStack as="ul" alignItems="start" spacing="5">
-              {user !== null && 
-              <>
-                {user.role !== UserRole.COOK && <Link to="/profile" onClick={onClose}>Profilo</Link>}
-                <ButtonLink action={handleLogout} onClick={onClose}>Logout</ButtonLink>
-                <Divider />
-              </>}
-              {user?.role !== UserRole.COOK && 
+              {!isAuth ? 
                 <>
                   <Link to="/chi-siamo" fontSize="lg" onClick={onClose}>Chi siamo</Link>
                   <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
                   <Link to="/contatti" fontSize="lg" onClick={onClose}>Contatti</Link>
-                  {!isAuth && <Link to="/login" fontSize="lg" onClick={onClose}>Login</Link>}
+                  <Link to="/login" fontSize="lg" onClick={onClose}>Login</Link>
                   <Cart onClick={onClose} />
-                </>
+                </> : user?.role === UserRole.CUSTOMER ? 
+                  <>
+                    <Link to="/profile" fontSize="lg" onClick={onClose}>Profilo</Link>
+                    <ButtonLink fontSize="lg" action={() => {handleLogout(); onClose();}} onClick={onClose}>Logout</ButtonLink>
+                    <Divider />
+                    <Link to="/chi-siamo" fontSize="lg" onClick={onClose}>Chi siamo</Link>
+                    <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
+                    <Link to="/contatti" fontSize="lg" onClick={onClose}>Contatti</Link>
+                    <Cart onClick={onClose} />
+                  </> : user?.role === UserRole.COOK ? 
+                    <>
+                      <ButtonLink action={handleLogout} fontSize="lg" onClick={onClose}>Logout</ButtonLink>
+                    </> :
+                    <>
+                      <ButtonLink action={handleLogout} fontSize="lg" onClick={onClose}>Logout</ButtonLink>
+                      <Divider />
+                      <Link to="/" fontSize="lg" onClick={onClose}>Transazioni</Link>
+                      <Link to="/menu" fontSize="lg" onClick={onClose}>Menù</Link>
+                      <Link to="/cooks" fontSize="lg" onClick={onClose}>Cuochi</Link>
+                    </>
               }
             </VStack>
           </DrawerBody>

@@ -15,7 +15,7 @@ function NavBar() {
   const { colorMode } = useColorMode(); 
   
   const { user, isAuth, logout } = useUserStore();
-
+  
   async function handleLogout() {
     await logout();
     navigate('/');
@@ -27,22 +27,28 @@ function NavBar() {
         <>
           <HStack as="ul" spacing="5">
             <Heading as={RLink} fontStyle="italic" to="/" size="xl">Vctmang</Heading>
-            {user?.role !== UserRole.COOK && 
-            <>
-              <Link to="/chi-siamo" fontSize="lg">Chi siamo</Link>
-              <Link to="/menu" fontSize="lg">Menù</Link>
-              <Link to="/contatti" fontSize="lg">Contatti</Link>
-            </>}
+            {!isAuth || user?.role === UserRole.CUSTOMER ?
+              <>
+                <Link to="/chi-siamo" fontSize="lg">Chi siamo</Link>
+                <Link to="/menu" fontSize="lg">Menù</Link>
+                <Link to="/contatti" fontSize="lg">Contatti</Link>
+              </> : user?.role === UserRole.ADMIN ?
+                <>
+                  <Link to="/" fontSize="lg">Transazioni</Link>  
+                  <Link to="/menu">Menù</Link>
+                  <Link to="/cooks">Cuochi</Link> 
+                </>: null
+            }
           </HStack>
           <HStack spacing="5">
-            {user?.role !== UserRole.COOK && <Cart />}
+            {(!isAuth || user?.role === UserRole.CUSTOMER) && <Cart />}
             <ColorModeSwitcher />
             {!isAuth ? 
               <Button as={RLink} to="/login" colorScheme="yellow">Login</Button> :
               <Menu>
                 <Avatar user={user!} as={MenuButton} />
                 <MenuList>
-                  {user?.role !== UserRole.COOK && 
+                  {user?.role === UserRole.CUSTOMER && 
                     <MenuItem as={RLink} to="/profile">Profilo</MenuItem>
                   }
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>

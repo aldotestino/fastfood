@@ -1,9 +1,10 @@
-import { Item, ItemType } from '../utils/types';
+import { Item, ItemType, UserRole } from '../utils/types';
 import { Box, Heading, GridItem, SimpleGrid, VStack } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
 import { useEffect, useState } from 'react';
 import { API_URL } from '../utils/vars';
 import LoadingPage from '../components/LoadingPage';
+import useUserStore from '../store/userStore';
 
 interface Items {
   ['Wrap']: Array<Item>
@@ -21,6 +22,8 @@ function Menu() {
     ['Burger']: [],
     ['Drink']: []
   });
+
+  const { user } = useUserStore();
 
   useEffect(() => {
     fetch(`${API_URL}/menu`).then(raw => raw.json()).then((res) => {
@@ -46,7 +49,7 @@ function Menu() {
               <Box w="100%" key={key}>
                 <Heading textAlign="center" mb="6" color="yellow.400" size="lg">{key}</Heading>
                 <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
-                  {list.map((item, i) => <GridItem key={i}><MenuItem {...item} /></GridItem>)}
+                  {list.map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} /></GridItem>)}
                 </SimpleGrid>
               </Box>
             )

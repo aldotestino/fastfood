@@ -10,6 +10,8 @@ import { Customer, Cook } from '@prisma/client';
 import cookController from './controllers/cookController';
 import { handleError } from './utils/middlewares';
 import orderController from './controllers/orderController';
+import userController from './controllers/userController';
+import adminController from './controllers/adminController';
 
 const PORT = process.env.PORT || 3001;
 
@@ -19,6 +21,7 @@ declare global {
     interface Request {
       customer: Partial<Customer>,
       cook: Partial<Cook>,
+      isAdmin: boolean,
       ioSocket: Server,
     }
   }
@@ -64,6 +67,8 @@ app.use((req, _, next) => {
 });
 
 app.use('/api/v1/menu', menuController);
+app.use('/api/v1/user', userController);
+app.use('/api/v1/admin', adminController);
 app.use('/api/v1/customer', customerController);
 app.use('/api/v1/cook', cookController);
 app.use('/api/v1/order', orderController);

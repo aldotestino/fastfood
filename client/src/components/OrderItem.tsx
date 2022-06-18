@@ -20,7 +20,7 @@ function OrderItem({ item, quantity, isDesktop }: OrderItemProps) {
         <Text fontSize="lg">{quantity} x {item.name}</Text>
         {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
       </HStack>
-      <Text fontSize="lg" fontWeight="bold">{item.price.toFixed(2)} €</Text>
+      <Text fontSize="lg" fontWeight="bold">{(item.price*quantity).toFixed(2)} €</Text>
     </HStack>
   );
 }

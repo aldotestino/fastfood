@@ -96,30 +96,6 @@ customerController.post('/login', async (req, res, next) => {
   });
 });
 
-customerController.get('/me', authenticateUser, (req, res, next) => {
-  if(req.customer) {
-    res.json({
-      success: true,
-      data: {
-        user: req.customer
-      }
-    });
-  }else {
-    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-  }
-});
-
-customerController.get('/logout', authenticateUser, (req, res, next) => {  
-  if(req.customer) {
-    res.clearCookie(Cookie.TOKEN);
-    res.json({
-      success: true
-    });
-  }else {
-    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-  }
-});
-
 customerController.get('/orders', authenticateUser, async (req, res, next) => {
   if(req.customer) {
     const orders = await prisma.order.findMany({
@@ -186,7 +162,8 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
       orderId: newOrder.id,
       state: newOrder.state,
       amount: newOrder.amount,
-      dateTime: newOrder.dateTime
+      dateTime: newOrder.dateTime,
+      customerEmail: req.customer.email
     });
 
     const newOrderItems = await prisma.orderItem.createMany({

@@ -12,41 +12,44 @@ import { Order, OrderState } from '@prisma/client';
 const cookController = Router();
 
 // Solo l'ADMIN può effettuare la registrazione di un cuoco, aggiungere middleware `isAdmin`
-cookController.post('/signup', async (req, res, next) => {
-  try {
-    const body = await CookSignupSchema.validate(req.body);
-    const hashedPassword = await bcrypt.hash(body.password, 10);
-    
-    const user = await prisma.cook.create({
-      data: {
-        ...body,
-        password: hashedPassword
-      }
-    });
-
-    res.json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          email: user.email
+cookController.post('/signup', authenticateUser, async (req, res, next) => {
+  if(req.isAdmin) {
+    try {
+      const body = await CookSignupSchema.validate(req.body);
+      const hashedPassword = await bcrypt.hash(body.password, 10);
+      
+      const user = await prisma.cook.create({
+        data: {
+          ...body,
+          password: hashedPassword
         }
+      });
+  
+      res.json({
+        success: true,
+        data: {
+          user: {
+            id: user.id,
+            email: user.email
+          }
+        }
+      });
+  
+    } catch(e: any) {
+      if(e.code === 'P2002') {
+        next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
+      }else if(e.name === 'ValidationError') {
+        next(new CustomError(e.message, ErrorCode.VALIDATION_ERROR));
+      }else {
+        next(new CustomError('Errore del server', ErrorCode.SERVER_ERROR));
       }
-    });
-
-  } catch(e: any) {
-    if(e.code === 'P2002') {
-      next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
-    }else if(e.name === 'ValidationError') {
-      next(new CustomError(e.message, ErrorCode.VALIDATION_ERROR));
-    }else {
-      next(new CustomError('Errore del server', ErrorCode.SERVER_ERROR));
     }
+  }else {
+    next(new CustomError('Solo l\'admin può aggiungere un novo cuoco', ErrorCode.UNAUTHORIZED));
   }
 });
 
 cookController.post('/login', async (req, res, next) => {
-
   if(req.cookies[Cookie.TOKEN]) {
     next(new CustomError('Utente già loggato', ErrorCode.UNAUTHORIZED));
     return;
@@ -59,7 +62,7 @@ cookController.post('/login', async (req, res, next) => {
     return;
   }
 
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
   const user = await prisma.cook.findUnique({
     where: {
       email
@@ -79,7 +82,7 @@ cookController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.COOK }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token, { maxAge: aDayInMillis });
+  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined });
 
   res.json({
     success: true,
@@ -90,30 +93,6 @@ cookController.post('/login', async (req, res, next) => {
       }
     }
   });
-});
-
-cookController.get('/me', authenticateUser, (req, res, next) => {
-  if(req.cook) {
-    res.json({
-      success: true,
-      data: {
-        user: req.cook
-      }
-    });
-  }else {
-    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-  }
-});
-
-cookController.get('/logout', authenticateUser, (req, res, next) => {
-  if(req.cook) {
-    res.clearCookie(Cookie.TOKEN);
-    res.json({
-      success: true
-    });
-  }else {
-    next(new CustomError('Utente non loggato', ErrorCode.UNAUTHORIZED));
-  }
 });
 
 cookController.get('/orders', authenticateUser, async (req, res, next) => {
@@ -223,6 +202,13 @@ cookController.post('/close-order', authenticateUser, async (req, res, next) => 
       });
 
       req.ioSocket.emit(req.cook.id, {
+        orderId: orderNewState.id,
+        state: orderNewState.state,
+        cookEmail: req.cook.email,
+        cookId: req.cook.id
+      });
+
+      req.ioSocket.emit(process.env.ROOT_ID!, {
         orderId: orderNewState.id,
         state: orderNewState.state,
         cookEmail: req.cook.email,

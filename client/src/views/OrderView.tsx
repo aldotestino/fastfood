@@ -8,9 +8,7 @@ import OrderItem from '../components/OrderItem';
 import useUserStore from '../store/userStore';
 import { Order, OrderChangeSocketEvent, OrderState, UserRole } from '../utils/types';
 import { API_URL } from '../utils/vars';
-import { m } from 'framer-motion';
 import { useSocket } from '../SocketProvider';
-import { io } from 'socket.io-client';
 
 function OrderView() {
 
@@ -21,7 +19,10 @@ function OrderView() {
       id: '',
       email: ''
     },
-    customerId: '',
+    customer: {
+      id: '',
+      email: ''
+    },
     dateTime: '',
     id: '',
     items: [],
@@ -43,31 +44,35 @@ function OrderView() {
         navigate(user?.customer ? '/profile': '/');
       }
     });
-  }, []);
+  }, [orderId]);
 
 
   useEffect(() => {
     if(ioSocket?.current) {
       ioSocket.current.addListener('order-taken', (data: OrderChangeSocketEvent) => {
-        if(user?.cook && user.cook.id !== data.cookId) {
-          navigate('/');
+        if(order.id === data.orderId) {
+          if(user?.cook && user.cook.id !== data.cookId) {
+            navigate('/');
+          }
+  
+          setOrder(ps => ({
+            ...ps,
+            cook: {
+              email: data.cookEmail,
+              id: data.cookId
+            },
+            state: data.state,
+          }));
         }
-
-        setOrder(ps => ({
-          ...ps,
-          cook: {
-            email: data.cookEmail,
-            id: data.cookId
-          },
-          state: data.state,
-        }));
       });
 
       ioSocket.current.addListener('order-closed', (data: OrderChangeSocketEvent) => {
-        setOrder(ps => ({
-          ...ps,
-          state: data.state
-        }));
+        if(order.id === data.orderId) {
+          setOrder(ps => ({
+            ...ps,
+            state: data.state
+          }));
+        }
       });
     }
 
@@ -107,15 +112,17 @@ function OrderView() {
           <Flex w="100%" justify="space-between" mb="6">
             <VStack spacing={2} align="flex-start">
               <HStack>
-                <IconButton onClick={() => navigate(user?.cook ? '/' : '/profile')} variant="ghost" aria-label='go back' icon={<ArrowBackIcon w="6" h="6"/>} />
+                <IconButton onClick={() => navigate(user?.role === UserRole.COOK || user?.role === UserRole.ADMIN ? '/' : '/profile')} variant="ghost" aria-label='go back' icon={<ArrowBackIcon w="6" h="6"/>} />
                 <Heading fontStyle="italic">
                   Ordine
                 </Heading>
               </HStack>
+              {(user?.role === UserRole.ADMIN || user?.role === UserRole.COOK) && <Text>da <span style={{ fontWeight: 'bold' }}>{order.customer.email}</span></Text>}
               {user?.role === UserRole.COOK && order.state !== OrderState.CLOSED && (order.state === OrderState.PENDING ? 
                 <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.TAKEN)}>Prendi ordine</Button> : 
                 <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.CLOSED)}>Chiudi ordine</Button>)}
-              {user?.role !== UserRole.COOK && order.cook && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando il tuo ordine.': 'ha chiuso il tuo ordine.'}</Text>}
+              {(user?.role === UserRole.CUSTOMER && order.cook) && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando il tuo ordine.': 'ha chiuso il tuo ordine.'}</Text>}
+              {(user?.role === UserRole.ADMIN && order.cook) && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando l\'ordine.': 'ha chiuso l\'ordine.'}</Text>}
             </VStack>
             <OrderCard ml="4" showButton={false} o={order} />
           </Flex>

@@ -58,6 +58,9 @@ export interface User {
   role: UserRole
   customer: Customer | null
   cook: Cook | null
+  admin: {
+    id: string
+  } | null
 }
 
 export enum OrderState {
@@ -68,16 +71,25 @@ export enum OrderState {
 
 export interface OrderSummary {
   id: string
-  amount: number,
-  state: OrderState,
+  amount: number
+  state: OrderState
   dateTime: string
 }
 
+export interface Transaction extends OrderSummary {
+  customer: {
+    email: string
+  } 
+}
+
 export interface Order extends OrderSummary {
-  customerId: string,
-  cook: Cook,
+  customer: {
+    id: string
+    email: string
+  }
+  cook: Cook
   items: Array<{
-    quantity: number,
+    quantity: number
     item: Item
   }>
 }
@@ -94,6 +106,7 @@ export interface NewOrderSocketEVent {
   state: OrderState
   amount: number
   dateTime: string
+  customerEmail: string
 }
 
 export type OnSubmitFunc<T> = (values: T, formikHelpers: FormikHelpers<T>) => void;
