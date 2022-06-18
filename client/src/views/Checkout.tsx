@@ -1,26 +1,4 @@
-import {
-  Button,
-  Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr, useMediaQuery,
-  Heading,
-  Text,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  useDisclosure,
-  useToast,
-  Flex
-} from '@chakra-ui/react';
+import { Button, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, useMediaQuery, Heading, Text, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, useDisclosure, useToast, Flex } from '@chakra-ui/react';
 import Link from '../components/Link';
 import useCartStore from '../store/cartStore';
 import CheckoutItem from '../components/CheckoutItem';
@@ -128,7 +106,7 @@ function Checkout() {
                   Annulla
                 </Button>
                 {isAuth ? 
-                  <Button colorScheme='yellow' isLoading={isLoading} onClick={handleCheckout} ml={3}>
+                  <Button colorScheme='yellow' isLoading={isLoading} disabled={isLoading} onClick={handleCheckout} ml={3}>
                     Continua
                   </Button> : 
                   <Button colorScheme='yellow' as={RLink} to="/login"  ml={3}>

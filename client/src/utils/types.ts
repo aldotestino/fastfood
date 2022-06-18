@@ -32,13 +32,18 @@ export enum UserRole {
 
 export interface LoginVariables {
   email: string
-  password: string,
+  password: string
 }
 
-export interface SignupVariables {
-  firstName: string,
-  lastName: string,
-  email: string,
+export interface CustomerSignupVariables {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+}
+
+export interface CookSignupVariables {
+  email: string
   password: string
 }
 

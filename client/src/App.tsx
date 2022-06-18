@@ -14,7 +14,7 @@ import CookProfile from './views/cookProfile';
 import OrderView from './views/OrderView';
 import LoadingPage from './components/LoadingPage';
 import Cooks from './views/Cooks';
-import Transactions from './views/transactions';
+import Transactions from './views/Transactions';
 
 function App() {
 

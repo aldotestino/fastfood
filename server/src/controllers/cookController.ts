@@ -11,7 +11,26 @@ import { Order, OrderState } from '@prisma/client';
 
 const cookController = Router();
 
-// Solo l'ADMIN può effettuare la registrazione di un cuoco, aggiungere middleware `isAdmin`
+cookController.get('/', authenticateUser, async (req, res, next) => {
+  if(req.isAdmin) {
+    const cooks = await prisma.cook.findMany({
+      select: {
+        email: true,
+        orders: true
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        cooks: cooks.map(c => ({ email: c.email, orders: c.orders.length }))
+      }
+    });
+  }else {
+    next(new CustomError('Solo l\'admin può visualizzare l\'elenco dei cuochi', ErrorCode.UNAUTHORIZED));
+  }
+});
+
 cookController.post('/signup', authenticateUser, async (req, res, next) => {
   if(req.isAdmin) {
     try {

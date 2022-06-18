@@ -4,13 +4,13 @@ import { Formik, Form } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
-import { SignupVariables, OnSubmitFunc, UserRole } from '../utils/types';
-import { SignupSchema } from '../utils/validators';
+import { CustomerSignupVariables, OnSubmitFunc, UserRole } from '../utils/types';
+import { CustomerSignupSchema } from '../utils/validators';
 import { API_URL } from '../utils/vars';
 import { Navigate, useNavigate } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 
-const initialValues: SignupVariables = {
+const initialValues: CustomerSignupVariables = {
   firstName: '',
   lastName: '',
   email: '',
@@ -24,7 +24,7 @@ function Signup() {
   const toast = useToast();
   const { isAuth, user } = useUserStore();
 
-  const onSubmit: OnSubmitFunc<SignupVariables> = async (values, { resetForm }) => {
+  const onSubmit: OnSubmitFunc<CustomerSignupVariables> = async (values, { resetForm }) => {
     setIsLoading(true);
     const res = await fetch(`${API_URL}/customer/signup`, {
       method: 'POST',
@@ -57,7 +57,7 @@ function Signup() {
         <Formik
           initialValues={initialValues}
           validateOnBlur={false}
-          validationSchema={SignupSchema}
+          validationSchema={CustomerSignupSchema}
           onSubmit={onSubmit}
         >
           {({ errors, touched }) =>
