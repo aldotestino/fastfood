@@ -158,6 +158,14 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
       }
     });
 
+    const newOrderItems = await prisma.orderItem.createMany({
+      data: itemsWithQuantity.map(i => ({
+        orderId: newOrder.id,
+        quantity: i.quantity,
+        itemId: i.id
+      }))
+    });
+
     req.ioSocket.emit('new-order', {
       orderId: newOrder.id,
       state: newOrder.state,
@@ -166,12 +174,12 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
       customerEmail: req.customer.email
     });
 
-    const newOrderItems = await prisma.orderItem.createMany({
-      data: itemsWithQuantity.map(i => ({
-        orderId: newOrder.id,
-        quantity: i.quantity,
-        itemId: i.id
-      }))
+    req.ioSocket.emit(req.customer.id, {
+      orderId: newOrder.id,
+      state: newOrder.state,
+      amount: newOrder.amount,
+      dateTime: newOrder.dateTime,
+      customerEmail: req.customer.email
     });
 
     res.json({

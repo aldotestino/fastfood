@@ -12,6 +12,7 @@ import { handleError } from './utils/middlewares';
 import orderController from './controllers/orderController';
 import userController from './controllers/userController';
 import adminController from './controllers/adminController';
+import { CLIENT_URL } from './utils/vars';
 
 const PORT = process.env.PORT || 3001;
 
@@ -31,23 +32,23 @@ const app = express();
 const server = http.createServer(app);
 const ioSocket = new Server(server, {
   cors: {
-    origin: 'http://192.168.1.101:3000',
+    origin: CLIENT_URL,
     methods: ['GET', 'POST'],
     credentials: true
   }
 });
 
-ioSocket.on('connection', (s) => {
-  console.log(`${s.id} connected`);
-  s.on('disconnect', () => {
-    console.log(`${s.id} disconnected`);
-  });
-});
+// ioSocket.on('connection', (s) => {
+//   console.log(`${s.id} connected`);
+//   s.on('disconnect', () => {
+//     console.log(`${s.id} disconnected`);
+//   });
+// });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
-  origin: 'http://192.168.1.101:3000',
+  origin: CLIENT_URL,
   credentials: true
 }));
 app.use(express.json());

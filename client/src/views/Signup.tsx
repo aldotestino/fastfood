@@ -66,7 +66,7 @@ function Signup() {
                 <InputField
                   name="firstName"
                   errorMessage={errors.firstName}
-                  label="First name"
+                  label="Nome"
                   placeholder="Mario"
                   type="text"
                   isInvalid={Boolean(errors.firstName && touched.firstName)}
@@ -75,7 +75,7 @@ function Signup() {
                 <InputField
                   name="lastName"
                   errorMessage={errors.lastName}
-                  label="Last name"
+                  label="Cognome"
                   placeholder="Rossi"
                   type="text"
                   isInvalid={Boolean(errors.lastName && touched.lastName)}

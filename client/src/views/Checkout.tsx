@@ -3,7 +3,7 @@ import Link from '../components/Link';
 import useCartStore from '../store/cartStore';
 import CheckoutItem from '../components/CheckoutItem';
 import { RefObject, useRef, useState } from 'react';
-import { Link as RLink } from 'react-router-dom';
+import { Link as RLink, useNavigate } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 import { API_URL } from '../utils/vars';
 
@@ -17,6 +17,7 @@ function Checkout() {
   const cancelRef = useRef() as RefObject<HTMLButtonElement>;
   const { isAuth } = useUserStore();
   const toast = useToast();
+  const navigate = useNavigate();
 
   async function handleCheckout() {
     setIsLoading(true);
@@ -42,6 +43,7 @@ function Checkout() {
         isClosable: true,
         position: 'top-right'
       });
+      navigate('/profile');
     }
   }
 

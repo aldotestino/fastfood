@@ -28,3 +28,4 @@ mongo-data
 *.jpeg
 *.avif
 seed.ts
+aws.sh

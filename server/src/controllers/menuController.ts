@@ -82,7 +82,7 @@ menuController.post('/', authenticateUser, async (req, res, next) => {
       });
     }catch(e: any) {
       if(e.code === 'P2002') {
-        next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
+        next(new CustomError('Nome già in uso', ErrorCode.EMAIL_IN_USE));
       }else if(e.name === 'ValidationError') {
         next(new CustomError(e.message, ErrorCode.VALIDATION_ERROR));
       }else {
@@ -151,11 +151,10 @@ menuController.post('/:itemId', authenticateUser, async (req, res, next) => {
 
     }catch(e: any) {
       if(e.code === 'P2002') {
-        next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
+        next(new CustomError('Nome già in uso', ErrorCode.EMAIL_IN_USE));
       }else if(e.name === 'ValidationError') {
         next(new CustomError(e.message, ErrorCode.VALIDATION_ERROR));
       }else {
-        console.log(e);
         next(new CustomError('Errore del server', ErrorCode.SERVER_ERROR));
       }
     }

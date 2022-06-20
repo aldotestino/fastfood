@@ -1,21 +1,11 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  FormControl,
-  FormLabel,
-  Heading,
-  Stack,
-  useToast,
-} from '@chakra-ui/react';
+import {Box,Button,Checkbox,Flex,FormControl,FormLabel,Heading,Stack,useToast} from '@chakra-ui/react';
 import Link from '../components/Link';
 import { Form, Formik } from 'formik';
 import InputField from '../components/InputField';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import { LoginVariables, OnSubmitFunc, UserRole } from '../utils/types';
-import { OptionBase, Select } from 'chakra-react-select';
+import { Select } from 'chakra-react-select';
 import { LoginSchema } from '../utils/validators';
 import { Navigate } from 'react-router-dom';
 import useUserStore from '../store/userStore';

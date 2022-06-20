@@ -30,14 +30,12 @@ function SocketProvider({ children }: SocketProviderProps) {
         ioSocket.current = socketio(SERVER_URL);
       }
 
-      ioSocket.current.on('new-order', (data: NewOrderSocketEVent) => {
-        emitter.current?.emit('new-order', data);
-      });
-
       if(user.role === UserRole.CUSTOMER && user.customer) {
         ioSocket.current.on(user.customer.id, (data: OrderChangeSocketEvent) => {
-
-          if(data.state === OrderState.TAKEN) {
+          
+          if(data.state === OrderState.PENDING) {
+            emitter.current?.emit('new-order', data)
+          }else if(data.state === OrderState.TAKEN) {
             emitter.current?.emit('order-taken', data);
           }else {
             emitter.current?.emit('order-closed', data);
@@ -72,6 +70,10 @@ function SocketProvider({ children }: SocketProviderProps) {
           emitter.current?.emit('order-closed', data);
         });
 
+        ioSocket.current.on('new-order', (data: NewOrderSocketEVent) => {
+          emitter.current?.emit('new-order', data);
+        });
+
       }else if(user.role === UserRole.ADMIN && user.admin) {
         ioSocket.current.on('order-taken', (data: OrderChangeSocketEvent) => {
           emitter.current?.emit('order-taken', data);
@@ -79,6 +81,10 @@ function SocketProvider({ children }: SocketProviderProps) {
 
         ioSocket.current.on(user.admin.id, (data: OrderChangeSocketEvent) => {
           emitter.current?.emit('order-closed', data);
+        });
+
+        ioSocket.current.on('new-order', (data: NewOrderSocketEVent) => {
+          emitter.current?.emit('new-order', data);
         });
       }
     }

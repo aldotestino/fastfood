@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, InputRightAddon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, InputRightAddon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useToast, VStack } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import InputField from './InputField';
 import { Item, ItemType, ItemVariables, OnSubmitFunc } from '../utils/types';
@@ -59,6 +59,7 @@ function CreateOrUpdateItem({ action, itemId, initialValues, isOpen, onClose, ad
   const [type, setType] = useState<ItemType>(initialValues.type);
   const [ingredients, setIngredients] = useState<Array<string>>(initialValues.ingredients);
   const [image, setImage] = useState<File | null | undefined>(null);
+  const toast = useToast();
 
   const handleUpdateItem: OnSubmitFunc<ItemVariables> = async (values) => {
     setIsLoading(true);
@@ -93,13 +94,21 @@ function CreateOrUpdateItem({ action, itemId, initialValues, isOpen, onClose, ad
       }),
       credentials: 'include'
     }).then(r => r.json());
-
     setIsLoading(false);
 
     if(res.success) {
       if(updateItem) {
         updateItem(res.data.item);
       }
+    }else {
+      toast({
+        title: 'Errore',
+        description: res.data.errorMessage,
+        status: 'error',
+        isClosable: true,
+        duration: 3000,
+        position: 'top-right'
+      });
     }
     
     handleOnClose();
@@ -145,6 +154,15 @@ function CreateOrUpdateItem({ action, itemId, initialValues, isOpen, onClose, ad
       if(addItemToMenu) {
         addItemToMenu(res.data.item);
       }
+    }else {
+      toast({
+        title: 'Errore',
+        description: res.data.errorMessage,
+        status: 'error',
+        isClosable: true,
+        duration: 3000,
+        position: 'top-right'
+      });
     }
 
     onClose();

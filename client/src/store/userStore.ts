@@ -75,8 +75,8 @@ const useStore = create<UserStore>(setState => ({
           } : null
         }
       });
-      return res; 
     }
+    return res; 
   },
   logout: async () => {
     const res = await fetch(`${API_URL}/user/logout`, {
