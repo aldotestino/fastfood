@@ -1,4 +1,4 @@
-import { Button, FormControl, FormErrorMessage, FormLabel, InputRightAddon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, InputRightAddon, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import InputField from './InputField';
 import { Item, ItemType, ItemVariables, OnSubmitFunc } from '../utils/types';
@@ -8,16 +8,23 @@ import { ItemSchema } from '../utils/validators';
 import FileUpload from './FileUpload';
 import { API_URL, ingredientsOptions } from '../utils/vars';
 
-interface AddItemProps {
-  isOpen: boolean
-  onClose: () => void
-  addItemToMenu: (newItem: Item) => void
+export interface ItemInitialValues {
+  name: string
+  price: number
+  ingredients: Array<string>
+  imageUrl: string
+  type: ItemType
 }
 
-const initialValues = {
-  name: '',
-  price: 0,
-};
+interface CreateOrUpdateItemProps {
+  action: 'create' | 'update'
+  initialValues: ItemInitialValues
+  isOpen: boolean
+  itemId?: string
+  onClose: () => void
+  addItemToMenu?: (newItem: Item) => void
+  updateItem?: (updatedItem: Item) => void
+}
 
 const typeOptions = [
   {
@@ -46,16 +53,60 @@ const typeOptions = [
   }
 ];
 
-function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
-
+function CreateOrUpdateItem({ action, itemId, initialValues, isOpen, onClose, addItemToMenu, updateItem }: CreateOrUpdateItemProps) {
+  
   const [isLoading, setIsLoading] = useState(false);
-  const [type, setType] = useState<ItemType>(ItemType.APETIZER);
-  const [ingredients, setIngredients] = useState<Array<string>>([]);
+  const [type, setType] = useState<ItemType>(initialValues.type);
+  const [ingredients, setIngredients] = useState<Array<string>>(initialValues.ingredients);
   const [image, setImage] = useState<File | null | undefined>(null);
 
-  const onSubmit: OnSubmitFunc<ItemVariables> = async (values, { resetForm }) => {
+  const handleUpdateItem: OnSubmitFunc<ItemVariables> = async (values) => {
     setIsLoading(true);
-    console.log({ values, type, image, ingredients });
+    let imageUploadSuccess = false;
+    if(image) {
+      const formData = new FormData();
+      formData.append(
+        'image',
+        image,
+        image.name
+      );
+      const res = await fetch(`${API_URL}/menu/upload-image`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      }).then(r => r.json());
+      if(res.success) {
+        imageUploadSuccess = true;
+      }
+    }
+
+    const res = await fetch(`${API_URL}/menu/${itemId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ...values,
+        ingredients,
+        type,
+        imageUrl: imageUploadSuccess ? image?.name : initialValues.imageUrl
+      }),
+      credentials: 'include'
+    }).then(r => r.json());
+
+    setIsLoading(false);
+
+    if(res.success) {
+      if(updateItem) {
+        updateItem(res.data.item);
+      }
+    }
+    
+    handleOnClose();
+  };
+
+  const handleCreateItem: OnSubmitFunc<ItemVariables> = async (values) => {
+    setIsLoading(true);
     let imageUploadSuccess = false;
     if(image) {
       const formData = new FormData();
@@ -88,38 +139,42 @@ function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
       credentials: 'include'
     }).then(r => r.json());
 
-    console.log(res);
-
+    setIsLoading(false);
+    
     if(res.success) {
-      addItemToMenu(res.data.item);
+      if(addItemToMenu) {
+        addItemToMenu(res.data.item);
+      }
     }
 
-    resetForm();
-    setType(ItemType.APETIZER);
-    setIngredients([]);
     onClose();
-    setIsLoading(false);
   };
 
   function onChangeFile(e: ChangeEvent<HTMLInputElement>) {
     setImage(e.target.files?.item(0));
   }
 
+  function handleOnClose() {
+    setType(initialValues.type);
+    setIngredients(initialValues.ingredients);
+    onClose();
+  }
+
   return (
     <Modal
       size="2xl"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleOnClose}
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Aggiungi elemento</ModalHeader>
+        <ModalHeader>{action === 'create' ? 'Aggiungi elemento' : 'Aggiorna elemento'}</ModalHeader>
         <ModalCloseButton />
         <Formik
-          initialValues={initialValues}
+          initialValues={{ name: initialValues.name, price: initialValues.price }}
           validateOnBlur={false}
           validationSchema={ItemSchema}
-          onSubmit={onSubmit}
+          onSubmit={action === 'create' ? handleCreateItem : handleUpdateItem}
         >
           {({ errors, touched }) =>
             <Form>
@@ -130,7 +185,7 @@ function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
                     <Select
                       options={typeOptions}
                       name="role"
-                      defaultValue={typeOptions[0]}
+                      defaultValue={typeOptions.find(t => t.value === initialValues.type)}
                       value={typeOptions.find(o => o.value === type)}
                       onChange={co => setType(co?.value as ItemType)}
                       focusBorderColor="yellow.400"
@@ -160,11 +215,12 @@ function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
                   >
                     <InputRightAddon>€</InputRightAddon>
                   </InputField>
-                  <FormControl isInvalid={type !== ItemType.DRINK && ingredients.length === 0 && touched.name}>
+                  <FormControl>
                     <FormLabel>Ingredienti</FormLabel>
                     <Select
                       options={ingredientsOptions}
                       name="ingredients"
+                      defaultValue={initialValues.ingredients.map(i => ({ label: i, value: i }))}
                       isMulti
                       placeholder="Seleziona ingredienti"
                       onChange={arr => setIngredients(arr.map(i => i.value))}
@@ -172,16 +228,15 @@ function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
                       selectedOptionStyle='check'
                       isDisabled={isLoading}
                     />
-                    <FormErrorMessage>Devi selezionare almeno un ingrediente</FormErrorMessage>
                   </FormControl>
-                  <FileUpload isDisabled={isLoading} file={image} onChangeFile={onChangeFile} acceptedFileTypes='image/png' name='image' placeholder={'Carica un\'immagine del prodotto'} />
+                  <FileUpload oldValue={initialValues.imageUrl} isDisabled={isLoading} file={image} onChangeFile={onChangeFile} acceptedFileTypes='image/png' name='image' placeholder={'Carica un\'immagine del prodotto'} />
                 </VStack>
               </ModalBody>
 
               <ModalFooter>
-                <Button onClick={onClose} mr={3} isDisabled={isLoading}>Annulla</Button>
+                <Button onClick={handleOnClose} mr={3} isDisabled={isLoading}>Annulla</Button>
                 <Button colorScheme='yellow' type="submit" isLoading={isLoading} isDisabled={isLoading}>
-                  Aggiungi
+                  {action === 'create' ? 'Aggiungi' : 'Aggiorna'}
                 </Button>
               </ModalFooter>
             </Form>
@@ -192,4 +247,4 @@ function AddItem({ isOpen, onClose, addItemToMenu }: AddItemProps) {
   );
 }
 
-export default AddItem;
+export default CreateOrUpdateItem;

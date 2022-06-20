@@ -3,11 +3,12 @@ import { ShoppingBagIcon } from '@heroicons/react/outline';
 import { RefObject, useState } from 'react';
 import useCartStore from '../store/cartStore';
 import shortid from 'shortid';
-import { Item, ItemType } from '../utils/types';
+import { Item } from '../utils/types';
 import Ingredients from './Ingredients';
 import { API_URL, IMAGE_URL } from '../utils/vars';
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import React from 'react';
+import CreateOrUpdateItem from './CreateOrUpdateItem';
 
 const MAX_QUANTITY = 10;
 
@@ -15,13 +16,15 @@ interface MenuItemProps {
   item: Item
   isAdmin: boolean,
   removeItemFromMenu: (item: Item) => void
+  updateItem: (item: Item) => void
 }
 
-function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
+function MenuItem({ item, isAdmin, removeItemFromMenu, updateItem }: MenuItemProps) {
 
   const imageUrl = `${IMAGE_URL}/${item.imageUrl}`;
 
   const { isOpen: isOpenConfirm, onOpen: onOpenConfirm, onClose: onCloseConfirm } = useDisclosure();
+  const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
   const cancelRef = React.useRef() as RefObject<HTMLButtonElement>;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -60,10 +63,6 @@ function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
     });
   }
 
-  function handleChangeItem() {
-    console.log(`modifica elmento ${item.id}`);
-  }
-
   async function handleDeleteItem() {
     setIsLoading(false);
     const res = await fetch(`${API_URL}/menu`, {
@@ -95,7 +94,7 @@ function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
       <Image alt={item.name} h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={imageUrl}/>
       <VStack>
         <HStack>
-          {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
+          {item.ingredients.length > 0 && <Ingredients ingredients={item.ingredients} />}
           <Text fontSize="xl">{item.name} - {item.price.toFixed(2)} €</Text>
         </HStack>
         {!isAdmin && <HStack maxW="150px">
@@ -107,7 +106,7 @@ function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
         {!isAdmin ? 
           <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button> :
           <HStack>
-            <Button leftIcon={<Icon as={EditIcon} />} onClick={handleChangeItem} colorScheme="yellow">Modifica</Button>
+            <Button leftIcon={<Icon as={EditIcon} />} onClick={onOpenEdit} colorScheme="yellow">Modifica</Button>
             <IconButton aria-label='delete item' onClick={onOpenConfirm} colorScheme="red" icon={<DeleteIcon />} />
           </HStack>
         }
@@ -140,6 +139,14 @@ function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
+
+      <CreateOrUpdateItem itemId={item.id} action="update" updateItem={updateItem} isOpen={isOpenEdit} onClose={onCloseEdit} initialValues={{
+        name: item.name,
+        imageUrl: item.imageUrl,
+        ingredients: item.ingredients,
+        price: item.price,
+        type: item.type
+      }} />
     </VStack>
   );
 }

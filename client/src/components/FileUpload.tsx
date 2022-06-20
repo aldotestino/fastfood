@@ -7,11 +7,12 @@ interface FileUploadProps {
   acceptedFileTypes: string
   name: string,
   placeholder: string
+  oldValue?: string
   file: File | null | undefined
   onChangeFile: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
-function FileUpload({ acceptedFileTypes, name, placeholder, file, isDisabled, onChangeFile }: FileUploadProps) {
+function FileUpload({ acceptedFileTypes, name, placeholder, oldValue, file, isDisabled, onChangeFile }: FileUploadProps) {
 
   const inputRef = useRef() as RefObject<HTMLInputElement>;
 
@@ -33,7 +34,7 @@ function FileUpload({ acceptedFileTypes, name, placeholder, file, isDisabled, on
           placeholder={placeholder}
           onClick={() => inputRef.current?.click()}
           readOnly={true}
-          value={file && file.name || ''}
+          value={file && file.name || oldValue || ''}
         />
       </InputGroup>
     </FormControl>

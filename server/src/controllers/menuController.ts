@@ -7,6 +7,7 @@ import CustomError from '../utils/CustomError';
 import { authenticateUser } from '../utils/middlewares';
 import { ErrorCode } from '../utils/types';
 import { ItemSchema } from '../utils/validators';
+import { Item } from '@prisma/client';
 
 const upload = multer({
   dest: path.join(__dirname, '..', 'public', 'images', 'items')
@@ -111,6 +112,56 @@ menuController.delete('/', authenticateUser, async (req, res, next) => {
     }catch(e: any) {
       next(new CustomError('Elemento inesistente', ErrorCode.ITEM_NOT_FOUND));
     }
+  }else {
+    next (new CustomError('Solo l\'admin può eliminare un elemento del menù', ErrorCode.UNAUTHORIZED));
+  }
+});
+
+menuController.post('/:itemId', authenticateUser, async (req, res, next) => {
+  if(req.isAdmin) {
+
+    const { name, price, ingredients, type, imageUrl } = req.body;
+
+    try {
+
+      ItemSchema.validateSync({
+        name,
+        price
+      });
+
+      const updatedItem = await prisma.item.update({
+        where: {
+          id: req.params.itemId
+        },
+        data: {
+          name,
+          price,
+          ingredients,
+          type,
+          imageUrl
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          item: updatedItem
+        }
+      });
+
+    }catch(e: any) {
+      if(e.code === 'P2002') {
+        next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
+      }else if(e.name === 'ValidationError') {
+        next(new CustomError(e.message, ErrorCode.VALIDATION_ERROR));
+      }else {
+        console.log(e);
+        next(new CustomError('Errore del server', ErrorCode.SERVER_ERROR));
+      }
+    }
+
+  }else {
+    next (new CustomError('Solo l\'admin può modificare un elemento del menù', ErrorCode.UNAUTHORIZED));
   }
 });
 
