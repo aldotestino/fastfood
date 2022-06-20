@@ -29,9 +29,10 @@ model Cook {
 model Item {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String      @unique
+  active      Boolean     @default(true)
   type        ItemType
   price       Float
-  imageUrl    String
+  imageUrl    String?
   ingredients String[]
   orderItem   OrderItem[]
 }

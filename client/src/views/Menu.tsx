@@ -1,39 +1,58 @@
 import { Item, ItemType, UserRole } from '../utils/types';
-import { Box, Heading, GridItem, SimpleGrid, VStack } from '@chakra-ui/react';
+import { Box, Heading, GridItem, SimpleGrid, VStack, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import MenuItem from '../components/MenuItem';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { API_URL } from '../utils/vars';
 import LoadingPage from '../components/LoadingPage';
 import useUserStore from '../store/userStore';
+import AddItem from '../components/AddItem';
 
-interface Items {
-  ['Wrap']: Array<Item>
-  ['Burger']: Array<Item>
-  ['Drink']: Array<Item>
-  ['Club Sandwich']: Array<Item>
+interface ItemsByType {
+  [ItemType.APETIZER]: Item[]
+  [ItemType.CLUB_SANDWICH]: Item[]
+  [ItemType.WRAP]: Item[]
+  [ItemType.BURGER]: Item[]
+  [ItemType.DESSERT]: Item[]
+  [ItemType.DRINK]: Item[]
 }
 
 function Menu() {
 
   const [isLoading, setIsLoading] = useState(true);
-  const [items, setItems] = useState<Items>({
-    ['Club Sandwich']: [],
-    ['Wrap']: [],
-    ['Burger']: [],
-    ['Drink']: []
-  });
+  const [items, setItems] = useState<Array<Item>>([]);
 
-  const { user } = useUserStore();
+  const itemsByType = useMemo(() => {
+    const r: ItemsByType = {
+      [ItemType.APETIZER]: [],
+      [ItemType.CLUB_SANDWICH]: [],
+      [ItemType.WRAP]: [],
+      [ItemType.BURGER]: [],
+      [ItemType.DESSERT]: [],
+      [ItemType.DRINK]: []
+    };
+
+    items.forEach(i => {
+      r[i.type].push(i);
+    });
+
+    return r;
+  }, [items]);
+
+  function addItemToMenu(newItem: Item) {
+    setItems(ps => [...ps, newItem]);
+  }
+
+  function removeItemFromMenu(item: Item) {
+    setItems(ps => ps.filter(i => i.id !== item.id));
+  }
+
+  const { user, isAuth } = useUserStore();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     fetch(`${API_URL}/menu`).then(raw => raw.json()).then((res) => {
       if(res.success) {
-        setItems({
-          ['Club Sandwich']: res.data.menu.filter((i: Item) => i.type === ItemType.CLUB_SANDWICH),
-          ['Wrap']: res.data.menu.filter((i: Item) => i.type === ItemType.WRAP),
-          ['Burger']: res.data.menu.filter((i: Item) => i.type === ItemType.BURGER),
-          ['Drink']: res.data.menu.filter((i: Item) => i.type === ItemType.DRINK)
-        });
+        setItems(res.data.menu);
         setIsLoading(false);
       }
     });
@@ -42,22 +61,64 @@ function Menu() {
   return (
     <>
       {!isLoading ? <Box px={[0, 5, 10, 20]} py={[5, 10]}>
-        <Heading ml={[5, 0]} fontStyle="italic">Menù</Heading>
+        <Flex justify="space-between" mb="6">
+          <Heading ml={[5, 0]} fontStyle="italic">Menù</Heading>
+          {(isAuth && user?.role === UserRole.ADMIN) && <Button mr={[5, 0]} onClick={onOpen} colorScheme="yellow">Aggiungi</Button>}
+        </Flex>
         <VStack w="100%" spacing="20">
-          {
-            Object.entries(items).map(([key, list]: [string,  Array<Item>]) => 
-              <Box w="100%" key={key}>
-                <Heading textAlign="center" mb="6" color="yellow.400" size="lg">{key}</Heading>
-                <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
-                  {list.map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} /></GridItem>)}
-                </SimpleGrid>
-              </Box>
-            )
+          {itemsByType[ItemType.APETIZER].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Apetizers</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.APETIZER].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
+          }
+          {itemsByType[ItemType.CLUB_SANDWICH].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Club Sandwich</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.CLUB_SANDWICH].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
+          }
+          {itemsByType[ItemType.WRAP].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Wrap</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.WRAP].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
+          }
+          {itemsByType[ItemType.BURGER].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Burger</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.BURGER].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
+          }
+          {itemsByType[ItemType.DESSERT].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Dessert</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.DESSERT].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
+          }
+          {itemsByType[ItemType.DRINK].length > 0 &&
+            <Box w="100%">
+              <Heading textAlign="center" mb="6" color="yellow.400" size="lg">Drink</Heading>
+              <SimpleGrid columns={[1, 1, 2, 3]} gap={[10, 5, 5]}>
+                {itemsByType[ItemType.DRINK].map((item, i) => <GridItem key={i}><MenuItem item={item} isAdmin={user?.role === UserRole.ADMIN} removeItemFromMenu={removeItemFromMenu} /></GridItem>)}
+              </SimpleGrid>
+            </Box>
           }
         </VStack>
       </Box> :
         <LoadingPage />
       }
+      <AddItem isOpen={isOpen} addItemToMenu={addItemToMenu} onClose={onClose} />
     </>
   );
 }

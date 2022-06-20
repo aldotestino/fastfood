@@ -28,7 +28,8 @@ function OrderView() {
     items: [],
     state: OrderState.PENDING
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUserStore();
   const navigate = useNavigate();
   const [isDesktop] = useMediaQuery('(min-width: 48em)');
@@ -38,6 +39,7 @@ function OrderView() {
     fetch(`${API_URL}/order/${orderId}`, {
       credentials: 'include'
     }).then(r => r.json()).then(res => {
+      setIsLoading(false);
       if(res.success) {
         setOrder(res.data.order);
       }else {
@@ -88,7 +90,7 @@ function OrderView() {
       [OrderState.TAKEN]: 'take-order',
       [OrderState.CLOSED]: 'close-order'
     };
-    setIsLoading(true);
+    setIsSubmitting(true);
     const res = await fetch(`${API_URL}/cook/${changeState[state]}`, {
       method: 'POST',
       headers: {
@@ -97,7 +99,7 @@ function OrderView() {
       body: JSON.stringify({ orderId: order?.id }),
       credentials: 'include'
     }).then(r => r.json());
-    setIsLoading(false);
+    setIsSubmitting(false);
     if(res.success) {
       setOrder(ps => ({
         ...ps,
@@ -119,8 +121,8 @@ function OrderView() {
               </HStack>
               {(user?.role === UserRole.ADMIN || user?.role === UserRole.COOK) && <Text>da <span style={{ fontWeight: 'bold' }}>{order.customer.email}</span></Text>}
               {user?.role === UserRole.COOK && order.state !== OrderState.CLOSED && (order.state === OrderState.PENDING ? 
-                <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.TAKEN)}>Prendi ordine</Button> : 
-                <Button isLoading={isLoading} onClick={() => changeOrderState(OrderState.CLOSED)}>Chiudi ordine</Button>)}
+                <Button isLoading={isSubmitting} onClick={() => changeOrderState(OrderState.TAKEN)}>Prendi ordine</Button> : 
+                <Button isLoading={isSubmitting} onClick={() => changeOrderState(OrderState.CLOSED)}>Chiudi ordine</Button>)}
               {(user?.role === UserRole.CUSTOMER && order.cook) && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando il tuo ordine.': 'ha chiuso il tuo ordine.'}</Text>}
               {(user?.role === UserRole.ADMIN && order.cook) && <Text fontSize="lg"><span style={{ fontWeight: 'bold', fontStyle: 'italic', textTransform: 'capitalize' }}>{order.cook.email.split('@')[0]}</span> {order.state === OrderState.TAKEN ? 'sta preparando l\'ordine.': 'ha chiuso l\'ordine.'}</Text>}
             </VStack>

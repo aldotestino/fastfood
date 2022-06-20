@@ -8,9 +8,9 @@ import Login from './views/Login';
 import Signup from './views/Signup';
 import useUserStore from './store/userStore';
 import { useEffect, useState } from 'react';
-import CustomerProfile from './views/customerProfile';
+import CustomerProfile from './views/CustomerProfile';
 import { UserRole } from './utils/types';
-import CookProfile from './views/cookProfile';
+import CookProfile from './views/CookProfile';
 import OrderView from './views/OrderView';
 import LoadingPage from './components/LoadingPage';
 import Cooks from './views/Cooks';
@@ -27,9 +27,9 @@ function App() {
   return (
     <Flex minH="100vh" direction="column">
       <NavBar />
-      {!isLoading ? 
+      {!isLoading ?
         <Routes>
-          {!isAuth || user?.role === UserRole.CUSTOMER ? 
+          {!isAuth || user?.role === UserRole.CUSTOMER ?
             <>
               <Route path="/" element={<Home />} />
               <Route path="/menu" element={<Menu />} />
@@ -46,13 +46,13 @@ function App() {
                 <Route path="/cooks" element={<Cooks />} />
               </>
           }
-          <Route path="order/:orderId" element={<OrderView />} />
+          {isAuth && <Route path="order/:orderId" element={<OrderView/>}/>}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-        </Routes> : 
+        </Routes> :
         <LoadingPage />
       }
-    </Flex> 
+    </Flex>
   );
 }
 

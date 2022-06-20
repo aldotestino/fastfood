@@ -1,7 +1,6 @@
 import { Box, Heading, HStack, VStack, Text, Tabs, TabList, TabPanels, TabPanel, Tab, Divider, Spinner, Center } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
 import Avatar from '../components/Avatar';
 import OrderCard from '../components/OrderCard';
 import { useSocket } from '../SocketProvider';

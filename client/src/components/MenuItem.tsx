@@ -1,26 +1,33 @@
-import { VStack, Image, Text, HStack, Button, Input, Icon } from '@chakra-ui/react';
+import { VStack, Image, Text, HStack, Button, Input, Icon, IconButton, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, AlertDialogContent, useToast } from '@chakra-ui/react';
 import { ShoppingBagIcon } from '@heroicons/react/outline';
-import { useState } from 'react';
+import { RefObject, useState } from 'react';
 import useCartStore from '../store/cartStore';
 import shortid from 'shortid';
 import { Item, ItemType } from '../utils/types';
 import Ingredients from './Ingredients';
-import { IMAGE_URL } from '../utils/vars';
-import { EditIcon } from '@chakra-ui/icons';
+import { API_URL, IMAGE_URL } from '../utils/vars';
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import React from 'react';
 
 const MAX_QUANTITY = 10;
 
 interface MenuItemProps {
   item: Item
-  isAdmin: boolean
+  isAdmin: boolean,
+  removeItemFromMenu: (item: Item) => void
 }
 
-function MenuItem({ item, isAdmin }: MenuItemProps) {
+function MenuItem({ item, isAdmin, removeItemFromMenu }: MenuItemProps) {
 
   const imageUrl = `${IMAGE_URL}/${item.imageUrl}`;
 
+  const { isOpen: isOpenConfirm, onOpen: onOpenConfirm, onClose: onCloseConfirm } = useDisclosure();
+  const cancelRef = React.useRef() as RefObject<HTMLButtonElement>;
+
+  const [isLoading, setIsLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const { addItemToCart } = useCartStore();
+  const toast = useToast();
 
   function increment() {
     if(quantity < MAX_QUANTITY) {
@@ -57,6 +64,32 @@ function MenuItem({ item, isAdmin }: MenuItemProps) {
     console.log(`modifica elmento ${item.id}`);
   }
 
+  async function handleDeleteItem() {
+    setIsLoading(false);
+    const res = await fetch(`${API_URL}/menu`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ itemId: item.id }),
+      credentials: 'include'
+    }).then(r => r.json());
+    setIsLoading(false);
+    onCloseConfirm();
+    if(res.success) {
+      removeItemFromMenu(item);
+    }else {
+      toast({
+        title: 'Errore',
+        description: res.data.errorMessage,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
+  }
+
   return (
     <VStack>
       <Image alt={item.name} h="xs" cursor="pointer" _hover={{ transform: 'scale(1.1)' }} style={{ filter: 'drop-shadow(5px 5px 5px #222)', transition: '.2s ease' }} src={imageUrl}/>
@@ -73,9 +106,40 @@ function MenuItem({ item, isAdmin }: MenuItemProps) {
         </HStack>}
         {!isAdmin ? 
           <Button leftIcon={<Icon as={ShoppingBagIcon} />} onClick={handleAddItemToCart} colorScheme="yellow">Aggiungi al carrello</Button> :
-          <Button leftIcon={<Icon as={EditIcon} />} onClick={handleChangeItem} colorScheme="yellow">Modifica</Button> 
+          <HStack>
+            <Button leftIcon={<Icon as={EditIcon} />} onClick={handleChangeItem} colorScheme="yellow">Modifica</Button>
+            <IconButton aria-label='delete item' onClick={onOpenConfirm} colorScheme="red" icon={<DeleteIcon />} />
+          </HStack>
         }
       </VStack>
+
+      <AlertDialog
+        isOpen={isOpenConfirm}
+        leastDestructiveRef={cancelRef}
+        onClose={onCloseConfirm}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              Rimuovi elemento
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              L&apos;elemento non sarà definitivamente eliminato per poter consultare gli ordini avvenuti prima dell&apos;eliminazione.
+              Sei sicuro di voler proseguire?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} isDisabled={isLoading} onClick={onCloseConfirm}>
+                Annulla
+              </Button>
+              <Button colorScheme='red' isLoading={isLoading} isDisabled={isLoading} onClick={handleDeleteItem} ml={3}>
+                Elimina
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </VStack>
   );
 }

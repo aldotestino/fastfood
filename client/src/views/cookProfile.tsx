@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import OrderCard from '../components/OrderCard';
 import { useSocket } from '../SocketProvider';
 import useUserStore from '../store/userStore';
-import { NewOrderSocketEVent, OrderChangeSocketEvent, OrderState, OrderSummary } from '../utils/types';
+import { NewOrderSocketEVent, OrderChangeSocketEvent, OrderSummary } from '../utils/types';
 import { API_URL } from '../utils/vars';
 
 interface Orders {

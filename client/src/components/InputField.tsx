@@ -18,7 +18,7 @@ function InputField({ label, errorMessage, icon, children, ...rest }: InputField
           <FormLabel>{label}</FormLabel>
           <InputGroup>
             {icon &&
-                <InputLeftElement >
+                <InputLeftElement pointerEvents="none">
                   <Icon as={icon} w="4" h="4" />
                 </InputLeftElement>
             }

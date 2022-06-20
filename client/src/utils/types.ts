@@ -84,7 +84,7 @@ export interface OrderSummary {
 export interface Transaction extends OrderSummary {
   customer: {
     email: string
-  } 
+  }
 }
 
 export interface Order extends OrderSummary {
@@ -112,6 +112,11 @@ export interface NewOrderSocketEVent {
   amount: number
   dateTime: string
   customerEmail: string
+}
+
+export interface ItemVariables {
+  name: string
+  price: number
 }
 
 export type OnSubmitFunc<T> = (values: T, formikHelpers: FormikHelpers<T>) => void;

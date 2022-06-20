@@ -1,10 +1,10 @@
-import { Table, TableCaption, TableContainer, Tbody, Th, Thead, Tr, Heading, Flex, Td, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, FormLabel, FormControl, ModalFooter, useDisclosure, VStack, InputRightAddon, useToast } from '@chakra-ui/react';
+import { Table, TableCaption, TableContainer, Tbody, Th, Thead, Tr, Heading, Flex, Td, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, VStack, InputRightAddon, useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { API_URL } from '../utils/vars';
 import LoadingPage from '../components/LoadingPage';
 import { Form, Formik } from 'formik';
 import InputField from '../components/InputField';
-import { CookSignupSchema, LoginSchema } from '../utils/validators';
+import { CookSignupSchema } from '../utils/validators';
 import { KeyIcon } from '@heroicons/react/outline';
 import { CookSignupVariables, LoginVariables, OnSubmitFunc } from '../utils/types';
 
@@ -25,8 +25,8 @@ function Cooks() {
     setIsLoading(true);
     fetch(`${API_URL}/cook`, {
       credentials: 'include'
-    }).then(r => r.json()).then(res => {      
-      if(res.success) {        
+    }).then(r => r.json()).then(res => {
+      if(res.success) {
         setCooks(res.data.cooks);
         setIsLoading(false);
       }
@@ -66,7 +66,7 @@ function Cooks() {
 
   return (
     <>
-      {!isLoading ? 
+      {!isLoading ?
         <TableContainer px={[0, 5, 10, 20]} py={[5, 10]}>
           <Flex justify="space-between">
             <Heading ml={[5, 0]} mb="6" fontStyle="italic">Cuochi</Heading>
@@ -83,9 +83,9 @@ function Cooks() {
             <Tbody>
               {cooks.map(c => <Tr key={c.email}><Td>{c.email}</Td><Td isNumeric>{c.orders}</Td></Tr>)}
             </Tbody>
-          </Table> 
-        </TableContainer> :    
-        <LoadingPage/>       
+          </Table>
+        </TableContainer> :
+        <LoadingPage/>
       }
 
       <Modal
@@ -102,7 +102,7 @@ function Cooks() {
             validationSchema={CookSignupSchema}
             onSubmit={onSubmit}
           >
-            {({ errors, touched }) => 
+            {({ errors, touched }) =>
               <Form>
                 <ModalBody pb={6}>
                   <VStack spacing="6">

@@ -25,12 +25,7 @@ const initialValues: LoginVariables = {
   password: '',
 };
 
-interface RoleOptions extends OptionBase {
-  label: string
-  value: string
-}
-
-const roleOptions: Array<RoleOptions> = [
+const roleOptions = [
   {
     label: 'Cliente',
     value: UserRole.CUSTOMER,
@@ -111,12 +106,12 @@ function Login() {
                 />
                 <FormControl>
                   <FormLabel>Ruolo</FormLabel>
-                  <Select 
-                    options={roleOptions} 
+                  <Select
+                    options={roleOptions}
                     name="role"
-                    defaultValue={roleOptions[0]} 
+                    defaultValue={roleOptions[0]}
                     value={roleOptions.find(o => o.value === role)}
-                    onChange={ro => setRole(ro?.value as UserRole)} 
+                    onChange={ro => setRole(ro?.value as UserRole)}
                     focusBorderColor="yellow.400"
                     selectedOptionStyle='check'
                     isDisabled={isLoading}

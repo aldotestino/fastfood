@@ -16,3 +16,8 @@ export const CookSignupSchema = Yup.object().shape({
   email: Yup.string().required('Questo campo è obbligatorio'),
   password: Yup.string().min(5, 'Passowrd troppo corta').required('Questo campo è obbligatorio')
 });
+
+export const ItemSchema = Yup.object().shape({
+  name: Yup.string().required('Questo campo è obbligatorio'),
+  price: Yup.number().min(0, 'Il prezzo deve essere maggiore di 0').required('Questo campo è obbligatorio'),
+});
