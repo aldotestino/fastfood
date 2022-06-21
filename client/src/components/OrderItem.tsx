@@ -16,7 +16,7 @@ function OrderItem({ item, quantity, isDesktop }: OrderItemProps) {
   return (
     <HStack w="100%" justify="space-between">
       <HStack>
-        {isDesktop && <Image h="100px" src={imageUrl} />}
+        {(isDesktop && item.imageUrl) && <Image h="100px" src={imageUrl} />}
         <Text fontSize="lg">{quantity} x {item.name}</Text>
         {item.type !== ItemType.DRINK && <Ingredients ingredients={item.ingredients} />}
       </HStack>

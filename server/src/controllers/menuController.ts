@@ -7,7 +7,6 @@ import CustomError from '../utils/CustomError';
 import { authenticateUser } from '../utils/middlewares';
 import { ErrorCode } from '../utils/types';
 import { ItemSchema } from '../utils/validators';
-import { Item } from '@prisma/client';
 
 const upload = multer({
   dest: path.join(__dirname, '..', 'public', 'images', 'items')
@@ -38,11 +37,16 @@ menuController.get('/', async (_, res) => {
 });
 
 menuController.post('/upload-image', upload.single('image'), authenticateUser, (req, res, next) => {
-  if(req.isAdmin && req.file) {
+  if(req.isAdmin) {
+
+    if(!req.file) {
+      return next(new CustomError('Si è verificato un errore nell\' upload dell\'immagine', 500));
+    }
+
     const tmpPath = req.file.path;
     const targetPath = path.join(__dirname, '..', 'public', 'images', 'items', req.file.originalname);
 
-    if(path.extname(req.file.originalname || '').toLowerCase() === '.png') {
+    if(path.extname(req.file.originalname).toLowerCase() === '.png') {
       fs.rename(tmpPath, targetPath, err => {
         if(err) return next(new CustomError(err.message, 400));
 

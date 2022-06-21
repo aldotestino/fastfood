@@ -174,7 +174,7 @@ customerController.post('/orders', authenticateUser, async (req, res, next) => {
       customerEmail: req.customer.email
     });
 
-    req.ioSocket.emit(req.customer.id, {
+    req.ioSocket.emit(req.customer.id!, {
       orderId: newOrder.id,
       state: newOrder.state,
       amount: newOrder.amount,

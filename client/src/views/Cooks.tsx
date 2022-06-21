@@ -76,7 +76,7 @@ function Cooks() {
             {cooks.length === 0 && <TableCaption>Non ci sono cuochi</TableCaption>}
             <Thead>
               <Tr>
-                <Th>ID</Th>
+                <Th>Email</Th>
                 <Th isNumeric>Ordini</Th>
               </Tr>
             </Thead>

@@ -24,7 +24,6 @@ mongo-data
 *.sln
 *.sw?
 
-*.png
 *.jpeg
 *.avif
 seed.ts

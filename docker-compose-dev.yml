@@ -10,6 +10,9 @@ services:
       - ./server/.env
     ports:
       - '3001:3001'
+    volumes:
+      - ./server:/usr/app/server
+      - /usr/app/server/node_modules
     container_name: server
 
   client:
@@ -18,6 +21,9 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - '3000:3000'
+    volumes:
+      - ./client:/usr/app/client
+      - /usr/app/client/node_modules
     container_name: client
 
   mongodb_migrate:
