@@ -36,14 +36,14 @@ cookController.post('/signup', authenticateUser, async (req, res, next) => {
     try {
       const body = await CookSignupSchema.validate(req.body);
       const hashedPassword = await bcrypt.hash(body.password, 10);
-      
+
       const user = await prisma.cook.create({
         data: {
           ...body,
           password: hashedPassword
         }
       });
-  
+
       res.json({
         success: true,
         data: {
@@ -53,7 +53,7 @@ cookController.post('/signup', authenticateUser, async (req, res, next) => {
           }
         }
       });
-  
+
     } catch(e: any) {
       if(e.code === 'P2002') {
         next(new CustomError('Email già in uso', ErrorCode.EMAIL_IN_USE));
@@ -101,7 +101,7 @@ cookController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.COOK }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined });
+  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined, secure: process.env.NODE_ENV === 'production' });
 
   res.json({
     success: true,

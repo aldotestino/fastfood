@@ -25,7 +25,7 @@ adminController.post('/login', (req, res, next) => {
 
   if(email === ROOT_EMAIL && password === ROOT_PASSWORD) {
     const token = jwt.sign({ id: ROOT_ID, role: UserRole.ADMIN }, process.env.JWT_SECRET!);
-    res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined });
+    res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined, secure: process.env.NODE_ENV === 'production' });
     res.json({
       success: true,
       data: {

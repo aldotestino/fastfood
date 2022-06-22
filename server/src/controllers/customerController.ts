@@ -1,4 +1,4 @@
-import e, { Router } from 'express';
+import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
@@ -12,7 +12,7 @@ import { aDayInMillis } from '../utils/vars';
 const customerController = Router();
 
 customerController.post('/signup', async (req, res, next) => {
-  try {    
+  try {
     const body = await CustomerSignupSchema.validate(req.body);
     const hashedPassword = await bcrypt.hash(body.password, 10);
 
@@ -61,7 +61,7 @@ customerController.post('/login', async (req, res, next) => {
   }
 
   const { email, password, remember } = req.body;
-  
+
   const user = await prisma.customer.findUnique({
     where: {
       email
@@ -81,7 +81,7 @@ customerController.post('/login', async (req, res, next) => {
 
   const token = jwt.sign({ id: user.id, role: UserRole.CUSTOMER }, process.env.JWT_SECRET!);
 
-  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined });
+  res.cookie(Cookie.TOKEN, token, { maxAge: remember ? aDayInMillis : undefined, secure: process.env.NODE_ENV === 'production' });
 
   res.json({
     success: true,
